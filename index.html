@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Population Explorers: Ghana edition</title>
+<title>Methods & materials of demography : Ghana edition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -296,7 +296,7 @@ function topbar(){
   const n=PE.missions.length,d=doneCount();
   const m=el('i');m.style.width=Math.round(100*d/n)+'%';
   return el('div',{class:'topbar'},
-    el('button',{class:'brand',onclick:()=>go('home'),'aria-label':'Back to the map'},PE.dot(36),el('span',{class:'t'},'Population Explorers')),
+    el('button',{class:'brand',onclick:()=>go('home'),'aria-label':'Back to the map'},PE.dot(36),el('span',{class:'t'},'Methods & materials of demography')),
     el('div',{class:'stats'},el('span',{class:'pill','aria-label':totalStars()+' stars'},'⭐ '+totalStars()),
       el('div',{class:'meter',role:'img','aria-label':d+' of '+n+' missions done'},m),el('span',null,d+'/'+n)));
 }
