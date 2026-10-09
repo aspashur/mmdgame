@@ -316,7 +316,7 @@ PE.go=go;
 function home(){
   const nx=nextMission();
   app.append(el('div',{class:'hero'},PE.dot(120,'wow'),
-    el('div',{class:'bubble'},el('h1',null,'Population Explorers'),
+    el('div',{class:'bubble'},el('h1',null,'Explorers : Methods & materials of demography'),
       el('p',null,'Hi, I am Dot! I count people for a living. Join me on 28 short missions, all using real numbers from Ghana, and you will learn what grown-up demographers know: how to count a whole country, why the number of people changes, and how to guess what we cannot count.'),
       el('p',{class:'meta',style:'color:var(--muted)'},'Based on the book “The Methods and Materials of Demography” (2nd edition, Siegel & Swanson). Each mission takes about 5 minutes.'),
       el('button',{class:'btn pulse',onclick:()=>go('mission',(nx||PE.missions[0]).id)},nx?(doneCount()?'Keep exploring':'Start mission 1'):'Replay a mission'))));
