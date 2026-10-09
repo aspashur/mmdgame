@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Population Explorers: Ghana edition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#EEF1FF; --dots:rgba(123,92,255,.20); --card:#FFFFFF; --text:#1D1B4B; --muted:#55538A;
+  --line:#1D1B4B; --on-bright:#1D1B4B;
+  --sun:#FFC93C; --mint:#2EC4A6; --berry:#FF5A87; --sky:#3DA5FF; --grape:#7B5CFF;
+  --good:#16A34A; --bad:#E11D48; --soft:#F5F3FF;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#14123A; --dots:rgba(185,183,240,.12); --card:#23206B; --text:#F2F1FF; --muted:#B9B7F0;
+    --line:#080720; --soft:#2E2A82; --good:#4ADE80; --bad:#FB7185;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14123A; --dots:rgba(185,183,240,.12); --card:#23206B; --text:#F2F1FF; --muted:#B9B7F0;
+  --line:#080720; --soft:#2E2A82; --good:#4ADE80; --bad:#FB7185;
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;font-size:17px;line-height:1.55;
+  color:var(--text);background-color:var(--bg);
+  background-image:radial-gradient(circle,var(--dots) 1.6px,transparent 1.8px);background-size:24px 24px}
+h1,h2,h3,h4{font-family:'Baloo 2','Trebuchet MS',system-ui,sans-serif;font-weight:800;line-height:1.1;margin:0 0 .4em}
+h1{font-size:clamp(2rem,6vw,3.2rem)} h2{font-size:clamp(1.5rem,4vw,2rem)} h3{font-size:1.25rem}
+p{margin:.4em 0 .8em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:4px solid var(--grape);outline-offset:3px;border-radius:10px}
+.app{max-width:980px;margin:0 auto;padding:0 16px 56px}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:0 -16px 18px;padding:10px 16px;
+  background:var(--bg);border-bottom:3px solid var(--line);display:flex;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:8px;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.15rem;cursor:pointer;background:none;border:0;padding:0}
+.stats{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:'Baloo 2',sans-serif;font-weight:800}
+.meter{width:96px;height:14px;border:3px solid var(--line);border-radius:99px;background:var(--card);overflow:hidden}
+.meter>i{display:block;height:100%;background:var(--mint);width:0;transition:width .5s}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border:3px solid var(--line);border-radius:99px;background:var(--sun);color:var(--on-bright)}
+.hero{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;margin:8px 0 28px}
+.hero .bubble{position:relative}
+.card{background:var(--card);border:3px solid var(--line);border-radius:20px;box-shadow:5px 5px 0 var(--line);padding:20px}
+.bubble{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:16px 20px;box-shadow:5px 5px 0 var(--line)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;background:var(--sun);color:var(--on-bright);
+  border:3px solid var(--line);border-radius:14px;box-shadow:0 4px 0 var(--line);padding:.55em 1.15em;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.05rem;transition:transform .08s,box-shadow .08s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn.alt{background:var(--card);color:var(--text)}
+.btn.mint{background:var(--mint)} .btn.sky{background:var(--sky)} .btn.berry{background:var(--berry)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.btn.pulse{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.05)}}
+.zone{margin:0 0 34px}
+.zonehead{display:flex;gap:14px;align-items:center;background:var(--z);color:var(--on-bright);border:3px solid var(--line);border-radius:20px 20px 0 0;padding:14px 18px;box-shadow:5px 0 0 var(--line)}
+.zonehead .ze{font-size:2.2rem}
+.zonehead h2{margin:0}
+.zonehead p{margin:0;font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px;background:var(--card);border:3px solid var(--line);border-top:0;border-radius:0 0 20px 20px;padding:16px;box-shadow:5px 5px 0 var(--line)}
+.tile{position:relative;text-align:left;cursor:pointer;background:var(--soft);border:3px solid var(--line);border-radius:16px;padding:14px 12px 12px;min-height:150px;display:flex;flex-direction:column;gap:4px;transition:transform .1s}
+.tile:hover{transform:translateY(-3px) rotate(-.6deg)}
+.tile .te{font-size:2rem;line-height:1}
+.tile .tn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:var(--z);color:var(--on-bright);border:3px solid var(--line);display:grid;place-items:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:.85rem}
+.tile .tt{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.05rem;line-height:1.15;margin-top:4px}
+.tile .tc{font-size:.8rem;color:var(--muted);font-weight:700}
+.tile .ts{margin-top:auto;font-size:1.05rem;letter-spacing:1px}
+.tile.next{border-color:var(--berry);animation:pulse 1.8s ease-in-out infinite}
+.tile.next::after{content:"Next up!";position:absolute;left:10px;bottom:-12px;background:var(--berry);color:#fff;border:3px solid var(--line);border-radius:99px;padding:0 10px;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:.85rem}
+.tile.done{background:var(--card)}
+.crumb{display:flex;align-items:center;gap:10px;margin:6px 0 14px;flex-wrap:wrap}
+.crumb .meta{color:var(--muted);font-weight:800}
+.stepper{display:flex;gap:8px;margin:10px 0 18px;flex-wrap:wrap}
+.step{padding:4px 14px;border:3px solid var(--line);border-radius:99px;background:var(--card);font-family:'Baloo 2',sans-serif;font-weight:800;font-size:.95rem;color:var(--muted)}
+.step.on{background:var(--grape);color:#fff}
+.step.ok{background:var(--mint);color:var(--on-bright)}
+.slide{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
+.slide .big{font-size:3.4rem;line-height:1;background:var(--z,var(--sun));border:3px solid var(--line);border-radius:20px;padding:12px 14px;box-shadow:3px 3px 0 var(--line);color:var(--on-bright)}
+.slide h3{font-size:1.5rem}
+.slide p{font-size:1.08rem}
+.booktag{display:inline-block;font-size:.82rem;font-weight:800;color:var(--muted);border:2px dashed var(--muted);border-radius:99px;padding:0 10px;margin-bottom:6px}
+.dotsline{display:flex;gap:6px;justify-content:center;margin:14px 0 4px}
+.dotsline i{width:12px;height:12px;border-radius:50%;border:3px solid var(--line);background:var(--card)}
+.dotsline i.on{background:var(--berry)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+.words details{border:3px solid var(--line);border-radius:14px;background:var(--soft);margin:8px 0;padding:6px 14px}
+.words summary{cursor:pointer;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.1rem}
+.words details[open]{background:var(--card)}
+.panel{background:var(--soft);border:3px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.panel h4{margin-bottom:.2em}
+.say{display:flex;gap:12px;align-items:flex-start;margin:6px 0 12px}
+.say .bubble{padding:10px 14px;box-shadow:3px 3px 0 var(--line);font-size:1rem}
+.fb{min-height:1.6em;font-weight:800;margin:8px 0}
+.fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+.sortcard{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.3rem;line-height:1.25;background:var(--card);border:3px solid var(--line);border-radius:16px;padding:18px;text-align:center;box-shadow:4px 4px 0 var(--line);margin:8px 0 14px}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.bucket{cursor:pointer;background:var(--sun);color:var(--on-bright);border:3px solid var(--line);border-radius:14px;box-shadow:0 4px 0 var(--line);padding:10px;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:1.02rem;line-height:1.15}
+.bucket:nth-child(2){background:var(--mint)} .bucket:nth-child(3){background:var(--sky)} .bucket:nth-child(4){background:var(--berry)}
+.bucket:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.bucket .be{display:block;font-size:1.6rem}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.chip{cursor:pointer;background:var(--card);border:3px solid var(--line);border-radius:14px;padding:8px 14px;box-shadow:0 3px 0 var(--line);font-weight:800;text-align:left}
+.orderlist{margin:10px 0;padding-left:0;list-style:none;counter-reset:o}
+.orderlist li{counter-increment:o;background:var(--mint);color:var(--on-bright);border:3px solid var(--line);border-radius:12px;padding:6px 12px;margin:6px 0;font-weight:800}
+.orderlist li::before{content:counter(o) ". ";font-family:'Baloo 2',sans-serif}
+.ctrl{display:grid;grid-template-columns:minmax(120px,1.1fr) 2fr 70px;gap:10px;align-items:center;margin:6px 0}
+.ctrl label{font-weight:800}
+.ctrl output{font-family:'Baloo 2',sans-serif;font-weight:800;text-align:right}
+input[type=range]{width:100%;accent-color:var(--grape);height:28px}
+input[type=number],input[type=text]{font:inherit;font-weight:800;padding:8px 12px;border:3px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);width:100%;max-width:240px}
+.readout{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.readout .r{background:var(--card);border:3px solid var(--line);border-radius:14px;padding:6px 14px;box-shadow:3px 3px 0 var(--line)}
+.readout .r b{font-family:'Baloo 2',sans-serif;font-size:1.4rem;display:block;line-height:1.1}
+.readout .r span{font-size:.82rem;color:var(--muted);font-weight:800}
+.chart{width:100%;height:auto;display:block;background:var(--card);border:3px solid var(--line);border-radius:14px}
+.chart text{fill:var(--text);font-family:'Nunito',sans-serif;font-weight:800}
+.toggle{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.toggle .btn{font-size:.95rem;padding:.35em .9em}
+.toggle .btn.on{background:var(--grape);color:#fff}
+.q h3{font-size:1.4rem}
+.opts{display:grid;gap:10px;margin:12px 0}
+.opt{cursor:pointer;text-align:left;background:var(--card);border:3px solid var(--line);border-radius:14px;box-shadow:0 4px 0 var(--line);padding:12px 16px;font-weight:800}
+.opt:hover{background:var(--soft)}
+.opt.right{background:var(--mint);color:var(--on-bright)}
+.opt.wrong{background:var(--berry);color:#fff}
+.win{text-align:center}
+.badge{display:inline-grid;place-items:center;width:150px;height:150px;border-radius:50%;background:var(--sun);color:var(--on-bright);border:4px solid var(--line);box-shadow:6px 6px 0 var(--line);font-size:3.6rem;margin:6px auto 10px;animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes pop{from{transform:scale(.2) rotate(-30deg)}}
+.stars{font-size:2.2rem;letter-spacing:4px}
+.cert{background:var(--card);border:6px double var(--line);border-radius:12px;padding:30px;text-align:center}
+.cert h1{font-size:clamp(1.8rem,5vw,2.6rem)}
+.foot{margin-top:30px;text-align:center;color:var(--muted);font-size:.9rem}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-weight:800}
+.grid10{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;max-width:420px;margin:8px 0}
+.grid10 i{aspect-ratio:1;border-radius:50%;border:2px solid var(--line);background:var(--mint)}
+.grid10 i.x{background:transparent;opacity:.35}
+.grid10 i.s{background:var(--berry)}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tbl{border-collapse:collapse;width:100%;font-size:.95rem}
+.tbl th,.tbl td{border:2px solid var(--line);padding:4px 8px;text-align:center}
+.tbl th{background:var(--soft);font-family:'Baloo 2',sans-serif}
+.person{display:inline-flex;align-items:center;gap:6px;border:3px solid var(--line);border-radius:99px;padding:2px 12px;background:var(--card);margin:3px}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.confetti i{position:absolute;top:-20px;width:10px;height:16px;animation:fall 2.4s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.noscript{padding:24px;font-weight:800}
+@media (max-width:640px){
+  body{font-size:16px}
+  .hero{grid-template-columns:1fr;text-align:center;justify-items:center}
+  .slide{grid-template-columns:1fr}
+  .ctrl{grid-template-columns:1fr 60px}
+  .ctrl input{grid-column:1/-1;grid-row:2}
+  .twocol{grid-template-columns:1fr}
+  .meter{width:60px}
+  .brand span.t{display:none}
+}
+@media print{
+  .topbar,.nav,.btn,.foot,.noprint{display:none!important}
+  body{background:#fff}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div id="app" class="app"><noscript><p class="noscript">This course needs JavaScript to run. Please turn it on and reload.</p></noscript></div>
+<script>
+(function(){
+'use strict';
+const PE=window.PE={missions:[],acts:{},zones:[
+ {k:1,e:'🏝️',n:'Counting Island',d:'How many of us are there, where do we live, and what are we like?',c:'var(--sky)'},
+ {k:2,e:'🌊',n:'Change River',d:'Births, deaths and moving house: why the number of people keeps changing.',c:'var(--mint)'},
+ {k:3,e:'🔮',n:'Crystal Tower',d:'What do you do when you cannot count everyone? Guess like a pro!',c:'var(--grape)'},
+ {k:4,e:'🧰',n:'Toolbox Cove',d:'Shortcuts, maps, maths tricks and the story of demography.',c:'var(--sun)'}
+]};
+const NS='http://www.w3.org/2000/svg';
+PE.el=function(tag,attrs,...kids){
+  const e=document.createElement(tag);
+  if(attrs)for(const k in attrs){const v=attrs[k];
+    if(k==='class')e.className=v;
+    else if(k==='html')e.innerHTML=v;
+    else if(k.slice(0,2)==='on')e.addEventListener(k.slice(2),v);
+    else if(v!==false&&v!=null)e.setAttribute(k,v);}
+  for(const c of kids.flat(2)){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(String(c)));}
+  return e;
+};
+PE.sv=function(tag,attrs,...kids){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs||{})e.setAttribute(k,attrs[k]);
+  for(const c of kids.flat(2)){if(c==null)continue;e.append(c.nodeType?c:document.createTextNode(String(c)));}
+  return e;
+};
+const el=PE.el;
+PE.rng=function(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};};
+PE.shuffle=function(a,r){r=r||Math.random;a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+PE.fmt=function(n,d){return Number(n).toLocaleString('en-US',{maximumFractionDigits:d==null?0:d,minimumFractionDigits:d||0});};
+PE.slider=function(parent,o){
+  const out=el('output',null,'');
+  const inp=el('input',{type:'range',min:o.min,max:o.max,step:o.step||1,value:o.value,'aria-label':o.label});
+  const show=()=>{out.textContent=(o.pre||'')+PE.fmt(inp.value,o.dec||0)+(o.suf||'');};
+  inp.addEventListener('input',()=>{show();o.on&&o.on(+inp.value);});
+  show();
+  parent.append(el('div',{class:'ctrl'},el('label',null,o.label),inp,out));
+  return {get:()=>+inp.value,set:v=>{inp.value=v;show();},inp};
+};
+PE.dot=function(size,mood){
+  size=size||72;
+  const s=PE.sv('svg',{viewBox:'0 0 100 100',width:size,height:size,role:'img','aria-label':'Dot the demographer'});
+  s.append(PE.sv('circle',{cx:50,cy:54,r:40,fill:'#FFC93C',stroke:'#1D1B4B','stroke-width':5}));
+  s.append(PE.sv('circle',{cx:36,cy:46,r:6,fill:'#1D1B4B'}),PE.sv('circle',{cx:64,cy:46,r:6,fill:'#1D1B4B'}));
+  s.append(PE.sv('circle',{cx:38,cy:44,r:2,fill:'#fff'}),PE.sv('circle',{cx:66,cy:44,r:2,fill:'#fff'}));
+  s.append(PE.sv('path',{d:mood==='wow'?'M38 66 Q50 82 62 66 Z':'M36 64 Q50 78 64 64',fill:mood==='wow'?'#FF5A87':'none',stroke:'#1D1B4B','stroke-width':5,'stroke-linecap':'round','stroke-linejoin':'round'}));
+  s.append(PE.sv('path',{d:'M30 20 L50 6 L70 20 Z',fill:'#7B5CFF',stroke:'#1D1B4B','stroke-width':5,'stroke-linejoin':'round'}));
+  s.append(PE.sv('circle',{cx:50,cy:6,r:5,fill:'#FF5A87',stroke:'#1D1B4B','stroke-width':3}));
+  return s;
+};
+PE.say=function(text){return el('div',{class:'say'},PE.dot(52),el('div',{class:'bubble',html:text}));};
+
+/* ---------- storage ---------- */
+const KEY='popexplorers_v1';
+const S=PE.state={done:{},name:''};
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.done)Object.assign(S,o);}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ---------- generic activities ---------- */
+PE.acts.sort=function(root,api,cfg){
+  const items=PE.shuffle(cfg.items);let i=0,score=0,first=true,lock=false;
+  const prog=el('div',{class:'meta'});
+  const card=el('div',{class:'sortcard'});
+  const fb=el('div',{class:'fb',role:'status','aria-live':'polite'});
+  const bx=el('div',{class:'buckets'},cfg.buckets.map(b=>el('button',{class:'bucket',onclick:()=>pick(b.k)},el('span',{class:'be'},b.e||''),b.label)));
+  root.append(prog,card,bx,fb);
+  function show(){
+    lock=false;first=true;
+    if(i>=items.length){card.textContent='All sorted! First-try score: '+score+' out of '+items.length+'.';bx.remove();fb.textContent='';prog.textContent='';api.done();return;}
+    prog.textContent='Item '+(i+1)+' of '+items.length;card.textContent=items[i].t;fb.textContent='';fb.className='fb';
+  }
+  function pick(k){
+    if(lock)return;const it=items[i];
+    if(k===it.k){if(first)score++;lock=true;fb.className='fb good';fb.textContent='✅ '+(it.w||'Yes!');i++;setTimeout(show,1300);}
+    else{first=false;fb.className='fb bad';fb.textContent='Not quite. '+(it.h||'Try a different box.');card.classList.remove('shake');void card.offsetWidth;card.classList.add('shake');}
+  }
+  show();
+};
+PE.acts.order=function(root,api,cfg){
+  const its=cfg.items.map((x,idx)=>typeof x==='string'?{t:x,idx}:{t:x.t,y:x.y,idx});
+  let next=0;
+  const fb=el('div',{class:'fb',role:'status','aria-live':'polite'});
+  const list=el('ol',{class:'orderlist','aria-label':'Your order so far'});
+  const pool=el('div',{class:'chips'});
+  PE.shuffle(its).forEach(o=>{
+    const b=el('button',{class:'chip',onclick:()=>{
+      if(o.idx===next){list.append(el('li',null,(o.y?o.y+': ':'')+o.t));b.remove();next++;fb.className='fb good';fb.textContent='✅ Yes! What came next?';
+        if(next===its.length){fb.textContent='🎉 Perfect order!';api.done();}}
+      else{fb.className='fb bad';fb.textContent='Hmm, that one does not come next. Think about what must happen first.';b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');}
+    }},o.t);pool.append(b);
+  });
+  root.append(el('p',null,cfg.prompt||'Tap the cards in the right order, first to last.'),list,pool,fb);
+};
+PE.acts.quizgym=function(root,api){
+  const all=[];PE.missions.forEach(m=>(m.words||[]).forEach(w=>all.push(w)));
+  const picks=PE.shuffle(all).slice(0,6);let i=0,sc=0;
+  const box=el('div');root.append(box);
+  function show(){
+    box.innerHTML='';
+    if(i>=picks.length){box.append(el('p',{class:'fb good'},'Glossary Gym done! '+sc+' of '+picks.length+' right.'));api.done();return;}
+    const w=picks[i];const wrong=PE.shuffle(all.filter(x=>x[0]!==w[0])).slice(0,2);
+    const opts=PE.shuffle([w].concat(wrong));
+    box.append(el('p',null,'Word '+(i+1)+' of '+picks.length+': what does ',el('b',null,w[0]),' mean?'));
+    const fb=el('div',{class:'fb'});let ans=false;
+    const wrap=el('div',{class:'opts'},opts.map(o=>el('button',{class:'opt',onclick:ev=>{
+      if(ans)return;
+      if(o===w){ans=true;sc++;ev.target.classList.add('right');fb.className='fb good';fb.textContent='Yes!';setTimeout(()=>{i++;show();},900);}
+      else{ev.target.classList.add('wrong');fb.className='fb bad';fb.textContent='Not that one. Try again!';}
+    }},o[1])));
+    box.append(wrap,fb);
+  }
+  show();
+};
+
+/* ---------- UI ---------- */
+const app=document.getElementById('app');
+function totalStars(){let t=0;for(const k in S.done)t+=S.done[k];return t;}
+function doneCount(){return Object.keys(S.done).length;}
+function zoneOf(m){return PE.zones.find(z=>z.k===m.zone);}
+function topbar(){
+  const n=PE.missions.length,d=doneCount();
+  const m=el('i');m.style.width=Math.round(100*d/n)+'%';
+  return el('div',{class:'topbar'},
+    el('button',{class:'brand',onclick:()=>go('home'),'aria-label':'Back to the map'},PE.dot(36),el('span',{class:'t'},'Population Explorers')),
+    el('div',{class:'stats'},el('span',{class:'pill','aria-label':totalStars()+' stars'},'⭐ '+totalStars()),
+      el('div',{class:'meter',role:'img','aria-label':d+' of '+n+' missions done'},m),el('span',null,d+'/'+n)));
+}
+function confetti(){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=el('div',{class:'confetti','aria-hidden':'true'});const cols=['#FFC93C','#2EC4A6','#FF5A87','#3DA5FF','#7B5CFF'];
+  for(let i=0;i<60;i++){const p=el('i');p.style.left=Math.random()*100+'%';p.style.background=cols[i%5];p.style.animationDelay=Math.random()*.8+'s';p.style.transform='rotate('+Math.random()*360+'deg)';c.append(p);}
+  document.body.append(c);setTimeout(()=>c.remove(),3600);
+}
+function nextMission(){return PE.missions.find(m=>!(m.id in S.done));}
+function go(view,id){
+  app.innerHTML='';window.scrollTo(0,0);
+  app.append(topbar());
+  if(view==='home')home();else if(view==='mission')mission(PE.missions.find(m=>m.id===id));else if(view==='cert')cert();
+}
+PE.go=go;
+function home(){
+  const nx=nextMission();
+  app.append(el('div',{class:'hero'},PE.dot(120,'wow'),
+    el('div',{class:'bubble'},el('h1',null,'Population Explorers'),
+      el('p',null,'Hi, I am Dot! I count people for a living. Join me on 28 short missions, all using real numbers from Ghana, and you will learn what grown-up demographers know: how to count a whole country, why the number of people changes, and how to guess what we cannot count.'),
+      el('p',{class:'meta',style:'color:var(--muted)'},'Based on the book “The Methods and Materials of Demography” (2nd edition, Siegel & Swanson). Each mission takes about 5 minutes.'),
+      el('button',{class:'btn pulse',onclick:()=>go('mission',(nx||PE.missions[0]).id)},nx?(doneCount()?'Keep exploring':'Start mission 1'):'Replay a mission'))));
+  PE.zones.forEach(z=>{
+    const ms=PE.missions.filter(m=>m.zone===z.k);
+    const box=el('section',{class:'zone',style:'--z:'+z.c},
+      el('div',{class:'zonehead'},el('span',{class:'ze'},z.e),el('div',null,el('h2',null,z.n),el('p',null,z.d))),
+      el('div',{class:'tiles'},ms.map(m=>{
+        const st=S.done[m.id];const idx=PE.missions.indexOf(m)+1;
+        return el('button',{class:'tile'+(st!=null?' done':'')+(nx&&nx.id===m.id?' next':''),onclick:()=>go('mission',m.id),'aria-label':'Mission '+idx+': '+m.title},
+          el('span',{class:'te'},m.emoji),el('span',{class:'tn'},idx),el('span',{class:'tt'},m.title),el('span',{class:'tc'},m.ch),
+          el('span',{class:'ts'},st!=null?'⭐'.repeat(Math.max(1,st)):'☆☆☆'));
+      })));
+    app.append(box);
+  });
+  if(doneCount()===PE.missions.length)app.append(el('div',{class:'card win'},el('h2',null,'You finished every mission!'),el('p',null,'Dot has a certificate waiting for you.'),el('button',{class:'btn mint',onclick:()=>go('cert')},'Get my certificate')));
+  const f=el('div',{class:'foot'},el('p',null,'Ghana facts come from the Ghana Statistical Service: the 2021 Population and Housing Census and the 2022 Demographic and Health Survey. Your progress is saved on this device. '),el('button',{class:'linkbtn',onclick:()=>{if(confirm('Start over and erase your stars?')){S.done={};save();go('home');}}},'Start over'));
+  app.append(f);
+}
+function cert(){
+  const name=el('input',{type:'text',placeholder:'Type your name',value:S.name||'','aria-label':'Your name'});
+  const nm=el('span',null,S.name||'Junior Demographer');
+  name.addEventListener('input',()=>{S.name=name.value;nm.textContent=name.value||'Junior Demographer';save();});
+  app.append(el('div',{class:'crumb noprint'},el('button',{class:'btn alt',onclick:()=>go('home')},'Back to map')),
+    el('div',{class:'cert'},PE.dot(90,'wow'),el('h1',null,'Certificate of Population Exploring'),el('p',null,'This is to say that'),el('h2',null,nm),
+      el('p',null,'completed all '+PE.missions.length+' missions, from counting a country to projecting its future, and earned '+totalStars()+' stars.'),
+      el('p',null,'Signed, Dot the Demographer')),
+    el('div',{class:'noprint',style:'margin-top:16px'},el('p',null,'Type your name here:'),name,el('p'),el('button',{class:'btn sky',onclick:()=>{try{window.print();}catch(e){}}},'Print it')));
+}
+function mission(m){
+  const z=zoneOf(m);const idx=PE.missions.indexOf(m)+1;
+  const wrap=el('div',{style:'--z:'+z.c});app.append(wrap);
+  const head=el('div',{class:'crumb'},el('button',{class:'btn alt',onclick:()=>go('home')},'← Map'),el('span',{class:'meta'},z.n+' · Mission '+idx+' of '+PE.missions.length));
+  const title=el('h1',null,m.emoji+' '+m.title);
+  const stepper=el('div',{class:'stepper'});
+  const body=el('div',{class:'card'});
+  wrap.append(head,title,stepper,body);
+  const names=['Learn','Play','Quiz','Win!'];
+  function steps(n){stepper.innerHTML='';names.forEach((t,i)=>stepper.append(el('span',{class:'step'+(i===n?' on':'')+(i<n?' ok':'')},(i<n?'✓ ':'')+t)));}
+  let ci=0,right=0;
+  function learn(){
+    steps(0);body.innerHTML='';
+    const total=m.cards.length+1;
+    if(ci<m.cards.length){
+      const c=m.cards[ci];
+      body.append(el('div',{class:'slide'},el('div',{class:'big','aria-hidden':'true'},c[0]),
+        el('div',null,ci===0?el('span',{class:'booktag'},'From the book: '+m.ch):null,el('h3',null,c[1]),el('p',{html:c[2]}),c[3]?PE.say(c[3]):null)));
+    }else{
+      body.append(el('h3',null,'📖 Your word bank'),el('p',null,'Tap a word to see what it means.'),
+        el('div',{class:'words'},m.words.map(w=>el('details',null,el('summary',null,w[0]),el('p',null,w[1])))));
+    }
+    body.append(el('div',{class:'dotsline'},Array.from({length:total},(_,i)=>el('i',{class:i===ci?'on':''}))));
+    body.append(el('div',{class:'nav'},
+      el('button',{class:'btn alt',disabled:ci===0,onclick:()=>{ci--;learn();}},'← Back'),
+      el('button',{class:'btn'+(ci===total-1?' pulse':''),onclick:()=>{if(ci<total-1){ci++;learn();}else play();}},ci===total-1?'Let’s play! →':'Next →')));
+  }
+  function play(){
+    steps(1);body.innerHTML='';const a=m.act;
+    body.append(el('h3',null,'🎮 '+a.title),el('p',{html:a.intro}));
+    const root=el('div');body.append(root);
+    let finished=false;
+    const nb=el('button',{class:'btn',onclick:()=>quiz()},'On to the quiz →');
+    const api={done:()=>{if(finished)return;finished=true;nb.classList.add('pulse');confetti();}};
+    try{(a.run?a.run:PE.acts[a.type])(root,api,a.cfg||{});}catch(err){root.append(el('p',null,'Oops, this game did not load: '+err.message));}
+    body.append(el('div',{class:'nav'},el('button',{class:'btn alt',onclick:()=>{ci=0;learn();}},'← Re-read'),nb));
+  }
+  function quiz(){
+    steps(2);let qi=0;right=0;
+    function q(){
+      body.innerHTML='';const Q=m.quiz[qi];let ans=false;
+      const order=PE.shuffle(Q.o.map((t,i)=>({t,i})));
+      const fb=el('div',{class:'fb',role:'status','aria-live':'polite'});
+      const nx=el('button',{class:'btn',style:'display:none',onclick:()=>{qi++;if(qi<m.quiz.length)q();else win();}},qi<m.quiz.length-1?'Next question →':'See my stars →');
+      body.append(el('div',{class:'meta'},'Question '+(qi+1)+' of '+m.quiz.length),el('div',{class:'q'},el('h3',null,Q.q)),
+        el('div',{class:'opts'},order.map(o=>el('button',{class:'opt',onclick:ev=>{
+          if(ans)return;ans=true;
+          if(o.i===Q.a){right++;ev.currentTarget.classList.add('right');fb.className='fb good';fb.textContent='✅ '+Q.w;}
+          else{ev.currentTarget.classList.add('wrong');fb.className='fb bad';fb.textContent='Not quite. '+Q.w;
+            body.querySelectorAll('.opt').forEach((b,k)=>{if(order[k].i===Q.a)b.classList.add('right');});}
+          nx.style.display='';nx.focus();
+        }},o.t))),fb,nx);
+    }
+    q();
+  }
+  function win(){
+    steps(3);body.innerHTML='';
+    const stars=Math.max(1,Math.round(3*right/m.quiz.length));
+    const prev=S.done[m.id];if(prev==null||stars>prev){S.done[m.id]=stars;save();}
+    confetti();
+    const nxt=PE.missions[idx];
+    body.append(el('div',{class:'win'},el('div',{class:'badge'},m.emoji),el('h2',null,'Badge earned: '+m.badge),
+      el('div',{class:'stars'},'⭐'.repeat(stars)+'☆'.repeat(3-stars)),
+      el('p',null,right+' of '+m.quiz.length+' right. '+(stars===3?'Perfect!':'Replay any time to win more stars.')),
+      PE.say(m.take),
+      el('div',{class:'nav',style:'justify-content:center'},
+        el('button',{class:'btn alt',onclick:()=>go('home')},'Back to the map'),
+        nxt?el('button',{class:'btn pulse',onclick:()=>go('mission',nxt.id)},'Next: '+nxt.title+' →'):el('button',{class:'btn mint pulse',onclick:()=>go('cert')},'Get my certificate'))));
+    const hd=document.querySelector('.topbar');if(hd)hd.replaceWith(topbar());
+  }
+  learn();
+}
+PE.start=function(){go('home');};
+})();
+(function(){
+const PE=window.PE,el=PE.el,sv=PE.sv;
+const abbr=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(1).replace(/\.0$/,'')+'M':Math.abs(n)>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'k':String(Math.round(n*10)/10);
+PE.abbr=abbr;
+PE.lineChart=function(W,H,series,o){
+  o=o||{};const pad={l:58,r:16,t:16,b:40};
+  const svg=sv('svg',{viewBox:'0 0 '+W+' '+H,class:'chart',role:'img','aria-label':o.label||'Line chart'});
+  let xs=[],ys=[];series.forEach(s=>s.pts.forEach(p=>{xs.push(p[0]);ys.push(p[1]);}));
+  const x0=o.xmin!=null?o.xmin:Math.min(...xs),x1=o.xmax!=null?o.xmax:Math.max(...xs);
+  const y0=o.ymin!=null?o.ymin:0,y1=o.ymax!=null?o.ymax:Math.max(...ys)*1.08||1;
+  const X=x=>pad.l+(x-x0)/(x1-x0||1)*(W-pad.l-pad.r),Y=y=>H-pad.b-(y-y0)/(y1-y0||1)*(H-pad.t-pad.b);
+  for(let i=0;i<=4;i++){const v=y0+(y1-y0)*i/4;svg.append(sv('line',{x1:pad.l,x2:W-pad.r,y1:Y(v),y2:Y(v),stroke:'#8884',...{}}),sv('text',{x:pad.l-6,y:Y(v)+4,'text-anchor':'end','font-size':12},abbr(v)));}
+  for(let i=0;i<=4;i++){const v=x0+(x1-x0)*i/4;svg.append(sv('text',{x:X(v),y:H-pad.b+16,'text-anchor':'middle','font-size':12},o.xfmt?o.xfmt(v):String(Math.round(v*10)/10)));}
+  if(o.xl)svg.append(sv('text',{x:W/2,y:H-6,'text-anchor':'middle','font-size':13},o.xl));
+  if(o.yl)svg.append(sv('text',{x:14,y:H/2,'text-anchor':'middle','font-size':13,transform:'rotate(-90 14 '+H/2+')'},o.yl));
+  series.forEach((s,k)=>{
+    svg.append(sv('polyline',{points:s.pts.map(p=>X(p[0])+','+Y(p[1])).join(' '),fill:'none',stroke:s.color,'stroke-width':4,'stroke-linejoin':'round','stroke-linecap':'round','stroke-dasharray':s.dash||''}));
+    if(s.label){svg.append(sv('rect',{x:pad.l+8+k*150,y:pad.t+2,width:14,height:14,rx:4,fill:s.color,stroke:'#1D1B4B','stroke-width':2}),sv('text',{x:pad.l+28+k*150,y:pad.t+14,'font-size':13},s.label));}
+  });
+  return svg;
+};
+PE.bars=function(W,H,data,o){
+  o=o||{};const pad={l:46,r:12,t:16,b:o.b||38};
+  const svg=sv('svg',{viewBox:'0 0 '+W+' '+H,class:'chart',role:'img','aria-label':o.label||'Bar chart'});
+  const ymax=o.ymax||Math.max(...data.map(d=>d.v))*1.1||1;
+  const bw=(W-pad.l-pad.r)/data.length;
+  for(let i=0;i<=4;i++){const v=ymax*i/4,y=H-pad.b-(H-pad.t-pad.b)*i/4;svg.append(sv('line',{x1:pad.l,x2:W-pad.r,y1:y,y2:y,stroke:'#8884'}),sv('text',{x:pad.l-6,y:y+4,'text-anchor':'end','font-size':12},abbr(v)));}
+  data.forEach((d,i)=>{
+    const h=(H-pad.t-pad.b)*d.v/ymax,x=pad.l+i*bw+bw*.12;
+    const r=sv('rect',{x,y:H-pad.b-h,width:bw*.76,height:Math.max(0,h),rx:5,fill:d.c||'#3DA5FF',stroke:'#1D1B4B','stroke-width':2.5});
+    if(d.on){r.style.cursor='pointer';r.addEventListener('click',d.on);}
+    svg.append(r,sv('text',{x:x+bw*.38,y:H-pad.b+15,'text-anchor':'middle','font-size':o.fs||12},d.l));
+    if(o.vals)svg.append(sv('text',{x:x+bw*.38,y:H-pad.b-h-5,'text-anchor':'middle','font-size':12},o.vf?o.vf(d.v):abbr(d.v)));
+  });
+  return svg;
+};
+
+/* Ch4: tag and recapture */
+PE.acts.capture=function(root,api){
+  const W=560,H=220;let st;
+  const svg=sv('svg',{viewBox:'0 0 '+W+' '+H,class:'chart',role:'img','aria-label':'A pond full of fish'});
+  const msg=el('div',{class:'panel'});const fb=el('div',{class:'fb',role:'status','aria-live':'polite'});
+  const b1=el('button',{class:'btn mint',onclick:tag},'1. Catch 40 fish and tag them');
+  const b2=el('button',{class:'btn sky',onclick:recatch,disabled:true},'2. Mix, then catch 40 again');
+  const b3=el('button',{class:'btn alt',onclick:reveal,disabled:true},'Reveal the real number');
+  const b4=el('button',{class:'btn alt',onclick:reset},'New pond');
+  root.append(svg,el('div',{class:'toggle'},b1,b2,b3,b4),msg,fb);
+  function reset(){
+    const r=PE.rng((Math.random()*1e9)|0);const N=Math.round((100+r()*140)/10)*10;
+    st={N,fish:[],m:0};
+    for(let i=0;i<N;i++)st.fish.push({x:18+r()*(W-36),y:18+r()*(H-36),tag:false,re:false});
+    b1.disabled=false;b2.disabled=true;b3.disabled=true;fb.textContent='';
+    msg.textContent='The pond hides a secret number of fish. Pretend you cannot count them all. Tag some, let them swim around, then see how many tagged fish turn up in a second net.';draw();
+  }
+  function draw(){
+    svg.innerHTML='';svg.append(sv('rect',{x:0,y:0,width:W,height:H,fill:'#7CC8FF',opacity:.3}));
+    st.fish.forEach(f=>{const c=f.tag?'#FF5A87':'#3DA5FF';
+      svg.append(sv('ellipse',{cx:f.x,cy:f.y,rx:7,ry:4.2,fill:c,stroke:f.re?'#1D1B4B':'none','stroke-width':2.6}),sv('path',{d:'M'+(f.x+6)+' '+f.y+' l6 -4 v8z',fill:c}));});
+  }
+  function pickIdx(k){return PE.shuffle(st.fish.map((_,i)=>i)).slice(0,k);}
+  function tag(){pickIdx(40).forEach(i=>st.fish[i].tag=true);b1.disabled=true;b2.disabled=false;draw();
+    msg.innerHTML='🏷️ <b>40 fish are tagged</b> (pink). Now they swim off and mix with all the others.';}
+  function recatch(){
+    st.fish.forEach(f=>f.re=false);const idx=pickIdx(40);let m=0;idx.forEach(i=>{st.fish[i].re=true;if(st.fish[i].tag)m++;});draw();b3.disabled=false;
+    if(m===0){msg.innerHTML='Second net: 40 fish, <b>0 tagged</b>. We cannot divide by zero! Net again.';return;}
+    const est=Math.round(40*40/m);
+    msg.innerHTML='Second net: <b>40 fish</b>, and <b>'+m+'</b> have a tag.<br>If '+m+' out of 40 are tagged, then 40 tagged fish are about '+m+'/40 of the whole pond.<br>Estimate = 40 × 40 ÷ '+m+' = <b>'+est+' fish</b>.';
+    st.m=m;st.est=est;api.done();
+  }
+  function reveal(){const e=st.est;fb.className='fb good';fb.textContent='The pond really holds '+st.N+' fish.'+(e?' Your estimate was '+e+', off by '+Math.abs(e-st.N)+'. Try netting again to see how the guess wobbles!':'');}
+  reset();
+};
+
+/* Ch5: center of population */
+PE.acts.centerpin=function(root,api){
+  const W=540,H=290;
+  const towns=[{n:'Bigport',x:110,y:175,p:70},{n:'Hilltop',x:300,y:70,p:20},{n:'Sandy Bay',x:430,y:195,p:35},{n:'Midway',x:250,y:205,p:15},{n:'Pine',x:150,y:62,p:10},{n:'Riverton',x:400,y:92,p:15}];
+  const P=towns.reduce((a,t)=>a+t.p,0);
+  const cx=towns.reduce((a,t)=>a+t.x*t.p,0)/P,cy=towns.reduce((a,t)=>a+t.y*t.p,0)/P;
+  const ux=towns.reduce((a,t)=>a+t.x,0)/towns.length,uy=towns.reduce((a,t)=>a+t.y,0)/towns.length;
+  const svg=sv('svg',{viewBox:'0 0 '+W+' '+H,class:'chart',role:'img','aria-label':'Map of an island with six towns of different sizes. Tap to place your pin.'});
+  svg.style.cursor='crosshair';
+  svg.append(sv('ellipse',{cx:270,cy:140,rx:250,ry:125,fill:'#B7F0C1',stroke:'#1D1B4B','stroke-width':3}));
+  towns.forEach(t=>{svg.append(sv('circle',{cx:t.x,cy:t.y,r:5+Math.sqrt(t.p)*1.7,fill:'#FFC93C',stroke:'#1D1B4B','stroke-width':3}),sv('text',{x:t.x,y:t.y-9-Math.sqrt(t.p)*1.7,'text-anchor':'middle','font-size':12,style:'fill:#1D1B4B;paint-order:stroke;stroke:#fff;stroke-width:3px'},t.n+' ('+t.p+'k)'));});
+  const layer=sv('g');svg.append(layer);let pin=null;
+  const fb=el('div',{class:'fb',role:'status','aria-live':'polite'});
+  const chk=el('button',{class:'btn',disabled:true,onclick:check},'Check my pin');
+  svg.addEventListener('click',e=>{
+    const r=svg.getBoundingClientRect();pin={x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H};
+    layer.innerHTML='';layer.append(sv('text',{x:pin.x,y:pin.y,'text-anchor':'middle','font-size':26},'📍'));chk.disabled=false;
+  });
+  function check(){
+    if(!pin)return;
+    layer.innerHTML='';
+    layer.append(sv('text',{x:pin.x,y:pin.y,'text-anchor':'middle','font-size':24},'📍'),
+      sv('text',{x:cx,y:cy+8,'text-anchor':'middle','font-size':30},'⭐'),
+      sv('text',{x:ux,y:uy+6,'text-anchor':'middle','font-size':20},'✖️'));
+    const d=Math.hypot(pin.x-cx,pin.y-cy);
+    fb.className='fb '+(d<35?'good':'bad');
+    fb.textContent=(d<35?'Great pin! ':'Close, but not quite. ')+'The ⭐ is the true center of population (the balance point if every person weighed the same). The ✖️ is just the middle of the towns on the map. See how Bigport pulls the star toward it? Crowded places pull harder.';
+    api.done();
+  }
+  root.append(el('p',null,'Tap the map to drop a pin where you think the island would balance if each person were a little weight.'),svg,el('div',{class:'toggle'},chk),fb);
+};
+
+/* Ch6: urban threshold */
+PE.acts.threshold=function(root,api){
+  const places=[['Hamlet',150],['Little Creek',600],['Maple Village',1800],['Stone Town',2700],['Harbor Town',4200],['Greenfield',9000],['Eastgate',18000],['Lakeside',45000],['Capital Heights',120000],['Metro City',300000]];
+  const opts=[200,1000,2500,5000,10000,20000,50000];
+  const total=places.reduce((a,p)=>a+p[1],0);
+  const out=el('div'),list=el('div',{class:'chips'}),ro=el('div',{class:'readout'});
+  const lab=el('output',null,'');
+  const inp=el('input',{type:'range',min:0,max:opts.length-1,step:1,value:2,'aria-label':'Smallest size that counts as urban'});
+  inp.addEventListener('input',render);
+  root.append(el('p',null,'This country has 10 places. Slide the rule: a place counts as ',el('b',null,'urban'),' when it has at least this many people. (Ghana’s rule is 5,000.)'),
+    el('div',{class:'ctrl'},el('label',null,'Urban rule'),inp,lab),list,ro,el('div',{class:'fb',id:'thfb'}));
+  let moved=new Set();
+  function render(){
+    const t=opts[+inp.value];moved.add(t);lab.textContent=PE.fmt(t)+'+';
+    list.innerHTML='';let u=0,n=0;
+    places.forEach(p=>{const isU=p[1]>=t;if(isU){u+=p[1];n++;}
+      list.append(el('span',{class:'person',style:'background:'+(isU?'var(--sun);color:#1D1B4B':'var(--card)')},(isU?'🏙️ ':'🌾 ')+p[0]+' '+PE.fmt(p[1])));});
+    ro.innerHTML='';
+    ro.append(el('div',{class:'r'},el('b',null,PE.fmt(100*u/total,1)+'%'),el('span',null,'of people are "urban"')),el('div',{class:'r'},el('b',null,n+' of 10'),el('span',null,'places are urban')));
+    if(t===5000)ro.append(el('div',{class:'r'},el('b',null,'🇬🇭 5,000'),el('span',null,'this is Ghana’s urban rule')));
+    if(moved.size>=4)api.done();
+  }
+  render();
+  root.append(el('p',{class:'meta',style:'color:var(--muted)'},'Same people, same places, only the rule changed. That is why the book warns about comparing "percent urban" between countries.'));
+};
+
+/* Ch7: pyramids */
+PE.acts.pyramid=function(root,api){
+  const groups=['0–14','15–24','25–34','35–44','45–54','55–64','65+'];
+  const P={
+    young:{n:'🌱 Young country',M:[30,24,19,14,10,6,3],F:[29,24,19,15,10,7,4],t:'Wide bottom: lots of children, fewer older people.'},
+    steady:{n:'🏛️ Steady country',M:[14,14,15,15,14,13,10],F:[13.5,13.8,14.8,15,14.5,14,13],t:'Almost straight sides: each age group is about the same size.'},
+    gh:{n:'🇬🇭 Ghana 2021 (real data)',M:[],F:[],t:''},
+    old:{n:'🌳 Older country',M:[9,10,11,13,15,16,12],F:[8.5,9.6,10.8,13,15.5,17,16],t:'Narrow bottom, wide top: many older people and fewer children.'}
+  };
+  let cur='young',seen=new Set();
+  const holder=el('div'),ro=el('div',{class:'readout'}),note=el('p');
+  const tg=el('div',{class:'toggle'},Object.keys(P).map(k=>el('button',{class:'btn',onclick:()=>{cur=k;draw();}},P[k].n)));
+  root.append(el('p',null,'Look at three pretend countries, then at real Ghana. Each bar shows how many people are in an age group (males on the left, females on the right).'),tg,holder,ro,note);
+  function draw(){
+    seen.add(cur);const d=P[cur];tg.querySelectorAll('.btn').forEach((b,i)=>b.classList.toggle('on',Object.keys(P)[i]===cur));
+    if(cur==='gh'){holder.innerHTML='';holder.append(PE.bars(520,230,[{l:'Children 0–14',v:10.890453,c:'#FFC93C'},{l:'Working age 15–64',v:18.619021,c:'#2EC4A6'},{l:'Older 65+',v:1.322545,c:'#7B5CFF'}],{vals:true,vf:v=>v.toFixed(1)+'M',label:'Ghana 2021 population by broad age group, in millions',ymax:22,fs:12}));ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,'97.3'),el('span',null,'sex ratio (males per 100 females)')),el('div',{class:'r'},el('b',null,'65.6'),el('span',null,'dependency ratio'))); note.textContent='Real numbers from the 2021 census: 10,890,453 children, 18,619,021 aged 15–64, 1,322,545 aged 65+. Dependency ratio = (10,890,453 + 1,322,545) ÷ 18,619,021 × 100.';if(seen.size>=3)api.done();return;}
+    const W=560,H=250,mid=W/2,max=32,sc=(mid-70)/max,bh=24;
+    const svg=sv('svg',{viewBox:'0 0 '+W+' '+H,class:'chart',role:'img','aria-label':'Population pyramid for '+d.n});
+    for(let i=0;i<7;i++){const y=H-30-(i+1)*(bh+5)+5;
+      svg.append(sv('rect',{x:mid-d.M[i]*sc,y,width:d.M[i]*sc,height:bh,rx:4,fill:'#3DA5FF',stroke:'#1D1B4B','stroke-width':2.5}),
+        sv('rect',{x:mid,y,width:d.F[i]*sc,height:bh,rx:4,fill:'#FF5A87',stroke:'#1D1B4B','stroke-width':2.5}),
+        sv('text',{x:mid,y:y+bh-7,'text-anchor':'middle','font-size':12,style:'paint-order:stroke;stroke:var(--card);stroke-width:4px'},groups[i]));}
+    svg.append(sv('text',{x:mid-90,y:H-8,'text-anchor':'middle','font-size':14},'Males'),sv('text',{x:mid+90,y:H-8,'text-anchor':'middle','font-size':14},'Females'));
+    holder.innerHTML='';holder.append(svg);
+    const tot=i=>d.M[i]+d.F[i];const kids=tot(0),old=tot(6);let work=0;for(let i=1;i<=5;i++)work+=tot(i);
+    const M=d.M.reduce((a,b)=>a+b,0),F=d.F.reduce((a,b)=>a+b,0);
+    ro.innerHTML='';
+    ro.append(el('div',{class:'r'},el('b',null,PE.fmt(100*M/F,1)),el('span',null,'sex ratio (males per 100 females)')),
+      el('div',{class:'r'},el('b',null,PE.fmt(100*(kids+old)/work,0)),el('span',null,'dependency ratio (kids + 65+ per 100 aged 15–64)')));
+    note.textContent=d.t+' Dependency ratio = (children under 15 + people 65 and over) ÷ people aged 15 to 64 × 100.';
+    if(seen.size>=3)api.done();
+  }
+  draw();
+};
+
+/* Ch7: age heaping */
+PE.acts.heaping=function(root,api){
+  const ages=[];for(let a=20;a<=39;a++)ages.push(a);
+  const honest=ages.map(a=>Math.round(1000-(a-20)*14));
+  const heap=ages.map((a,i)=>Math.round(honest[i]*(a%5===0?1.7:0.86)));
+  let mode='real',found=new Set();
+  const holder=el('div'),fb=el('div',{class:'fb',role:'status','aria-live':'polite'}),ro=el('div',{class:'readout'});
+  const tg=el('div',{class:'toggle'},el('button',{class:'btn',onclick:()=>{mode='real';draw();}},'📋 What people reported'),el('button',{class:'btn',onclick:()=>{mode='honest';draw();}},'✅ What it should look like'));
+  root.append(el('p',null,'These bars show how many people said they were each age. In the ',el('b',null,'reported'),' chart, tap the bars that look suspiciously tall. There are four culprits!'),tg,holder,ro,fb);
+  function draw(){
+    tg.querySelectorAll('.btn').forEach((b,i)=>b.classList.toggle('on',(i===0)===(mode==='real')));
+    const vals=mode==='real'?heap:honest;
+    const data=ages.map((a,i)=>({l:String(a),v:vals[i],c:mode==='real'?(found.has(a)?'#FF5A87':'#3DA5FF'):'#2EC4A6',on:mode==='real'?()=>click(a):null}));
+    holder.innerHTML='';holder.append(PE.bars(560,250,data,{label:'People reported at each age from 20 to 39',fs:11,b:30}));
+    const tot=vals.reduce((a,b)=>a+b,0),z=ages.reduce((s,a,i)=>s+(a%5===0?vals[i]:0),0);
+    ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,PE.fmt(100*z/tot,0)+'%'),el('span',null,'say an age ending in 0 or 5 (honest data: about 20%)')));
+  }
+  function click(a){
+    if(a%5===0){found.add(a);fb.className='fb good';fb.textContent='🕵️ Yes! Age '+a+' is too tall. People like round numbers. Found '+found.size+' of 4.';if(found.size===4){fb.textContent='🎉 All four found! This is called age heaping (digit preference).';api.done();}}
+    else{fb.className='fb bad';fb.textContent='Age '+a+' looks normal. Look for ages ending in 0 or 5.';}
+    draw();
+  }
+  draw();
+};
+
+/* Ch8: question wording on planet Zog */
+PE.acts.zog=function(root,api){
+  const people=[['Ava',['Sun']],['Ben',['Moon']],['Cy',['Star']],['Dee',['Sun','Moon']],['Eli',['Sun']],['Fay',['Moon','Star']],['Gus',['Star']],['Hal',['Sun']],['Ivy',['Moon']],['Jo',['Sun','Star']],['Kit',['Star']],['Lee',['Moon']]];
+  let form='A',seen=new Set();
+  const tg=el('div',{class:'toggle'},el('button',{class:'btn',onclick:()=>{form='A';draw();}},'Form A: pick ONE team'),el('button',{class:'btn',onclick:()=>{form='B';draw();}},'Form B: pick ONE OR MORE'));
+  const holder=el('div'),who=el('div'),fb=el('div',{class:'fb'});
+  root.append(el('p',null,'On planet Zog people belong to the Sun, Moon or Star team. Some belong to two. Count the same 12 people with two different forms.'),
+    who,tg,holder,fb);
+  who.append(...people.map(p=>el('span',{class:'person'},'🙂 '+p[0]+': '+p[1].join(' + '))));
+  function draw(){
+    seen.add(form);tg.querySelectorAll('.btn').forEach((b,i)=>b.classList.toggle('on',(i===0)===(form==='A')));
+    let c;
+    if(form==='A'){c={Sun:0,Moon:0,Star:0,Other:0};people.forEach(p=>{if(p[1].length===1)c[p[1][0]]++;else c.Other++;});
+      fb.textContent='Form A forces one choice, so everyone with two teams ends up in "Other".';}
+    else{c={Sun:0,Moon:0,Star:0,'2+ teams':0};people.forEach(p=>{if(p[1].length>1)c['2+ teams']++;p[1].forEach(t=>c[t]++);});
+      fb.textContent='Form B lets people tick every team, so some people are counted in two bars. We also see who has two or more.';}
+    holder.innerHTML='';
+    const cols=['#FFC93C','#7B5CFF','#3DA5FF','#FF5A87'];
+    holder.append(PE.bars(520,200,Object.keys(c).map((k,i)=>({l:k,v:c[k],c:cols[i]})),{ymax:10,vals:true,label:'Counts for each team',fs:13}));
+    if(seen.size===2)api.done();
+  }
+  draw();
+};
+
+/* Ch11: bathtub */
+PE.acts.bathtub=function(root,api){
+  let P=1000,yr=0,runs=0;const hist=[1000];
+  const sB=PE.slider(root,{label:'Births per year',min:0,max:100,value:40,on:()=>draw()});
+  const sD=PE.slider(root,{label:'Deaths per year',min:0,max:100,value:20,on:()=>draw()});
+  const sI=PE.slider(root,{label:'Immigrants (moving in) per year',min:0,max:100,value:15,on:()=>draw()});
+  const sE=PE.slider(root,{label:'Emigrants (moving out) per year',min:0,max:100,value:5,on:()=>draw()});
+  const holder=el('div'),eq=el('div',{class:'panel'});
+  const b1=el('button',{class:'btn mint',onclick:()=>run(1)},'Run 1 year'),b2=el('button',{class:'btn sky',onclick:()=>run(10)},'Run 10 years'),b3=el('button',{class:'btn alt',onclick:()=>{P=1000;yr=0;hist.length=1;hist[0]=1000;runs=0;draw();}},'Reset');
+  root.append(el('div',{class:'toggle'},b1,b2,b3),holder,eq);
+  function run(n){for(let i=0;i<n;i++){P=Math.max(0,P+sB.get()-sD.get()+sI.get()-sE.get());yr++;hist.push(P);}runs++;draw();if(runs>=2)api.done();}
+  function draw(){
+    const W=560,H=230,max=Math.max(2000,Math.max(...hist)*1.1);
+    const svg=sv('svg',{viewBox:'0 0 '+W+' '+H,class:'chart',role:'img','aria-label':'A bathtub whose water level is the population'});
+    const tx=190,tw=180,ty=50,th=150,h=th*Math.min(1,P/max);
+    svg.append(sv('rect',{x:tx,y:ty+th-h,width:tw,height:h,fill:'#3DA5FF',opacity:.8}),sv('rect',{x:tx,y:ty,width:tw,height:th,fill:'none',stroke:'#1D1B4B','stroke-width':5,rx:10}),
+      sv('text',{x:tx+tw/2,y:ty+th/2+6,'text-anchor':'middle','font-size':28},PE.fmt(P)),
+      sv('text',{x:tx+tw/2,y:ty-8,'text-anchor':'middle','font-size':13},'Population after '+yr+' year'+(yr===1?'':'s')));
+    svg.append(sv('text',{x:20,y:40,'font-size':14},'⬇️ Births +'+sB.get()),sv('text',{x:20,y:68,'font-size':14},'⬇️ Moving in +'+sI.get()),
+      sv('text',{x:W-20,y:40,'text-anchor':'end','font-size':14},'Deaths −'+sD.get()+' ⬇️'),sv('text',{x:W-20,y:68,'text-anchor':'end','font-size':14},'Moving out −'+sE.get()+' ⬇️'));
+    holder.innerHTML='';holder.append(svg);
+    const ni=sB.get()-sD.get(),nm=sI.get()-sE.get();
+    eq.innerHTML='<b>The balancing equation:</b> new population = old population + births − deaths + immigrants − emigrants.<br>Each year: natural increase (births − deaths) = <b>'+(ni>=0?'+':'')+ni+'</b>, net migration (in − out) = <b>'+(nm>=0?'+':'')+nm+'</b>, total change = <b>'+(ni+nm>=0?'+':'')+(ni+nm)+'</b>.';
+  }
+  draw();
+};
+
+/* Ch11: growth patterns */
+PE.acts.growth=function(root,api){
+  const holder=el('div'),ro=el('div',{class:'readout'}),note=el('p',{class:'meta',style:'color:var(--muted)'});let touched=0,view='model';
+  const s=PE.slider(root,{label:'Growth rate per year',min:0.5,max:5,step:0.05,value:2.1,dec:2,suf:'%',on:()=>{touched++;view='model';draw();}});
+  const gh=el('button',{class:'btn alt',onclick:()=>{s.set(2.1);view='model';touched++;draw();}},'🇬🇭 Ghana’s 2010–2021 rate: 2.1%');
+  const br=el('button',{class:'btn alt',onclick:()=>{s.set(1.35);view='model';touched++;draw();}},'Brazil 1991–96: 1.35%');
+  const real=el('button',{class:'btn',onclick:()=>{view='real';touched+=2;draw();}},'🇬🇭 Ghana’s real census counts');
+  root.append(el('div',{class:'toggle'},gh,br,real),holder,ro,note);
+  function draw(){
+    holder.innerHTML='';ro.innerHTML='';
+    if(view==='real'){
+      const yrs=[['1960',6.726815],['1970',8.559313],['1984',12.296081],['2000',18.912079],['2010',24.658823],['2021',30.832019]];
+      holder.append(PE.bars(560,250,yrs.map(y=>({l:y[0],v:y[1],c:'#FFC93C'})),{vals:true,vf:v=>v.toFixed(1)+'M',ymax:36,label:'Ghana population at each census, in millions',fs:13}));
+      ro.append(el('div',{class:'r'},el('b',null,'4.6×'),el('span',null,'Ghana in 2021 versus 1960 (30.8M ÷ 6.7M)')),el('div',{class:'r'},el('b',null,'+6,173,196'),el('span',null,'people added between the 2010 and 2021 censuses')));
+      note.textContent='Real census counts from the Ghana Statistical Service. The 2010 to 2021 growth was about 2.1% a year, the slowest between censuses on record.';
+      if(touched>=3)api.done();return;
+    }
+    const r=s.get()/100,P0=1e6,lin=[],exp=[];
+    for(let t=0;t<=100;t+=2){lin.push([t,P0*(1+r*t)]);exp.push([t,P0*Math.exp(r*t)]);}
+    holder.append(PE.lineChart(560,260,[{pts:lin,color:'#3DA5FF',label:'Linear'},{pts:exp,color:'#FF5A87',label:'Exponential'}],{xl:'Years from now',label:'Linear versus exponential growth',ymin:0}));
+    const dt=Math.log(2)/r;
+    ro.append(el('div',{class:'r'},el('b',null,PE.fmt(dt,1)+' years'),el('span',null,'doubling time = 0.693 ÷ rate')),el('div',{class:'r'},el('b',null,PE.fmt(70/s.get(),1)+' years'),el('span',null,'quick rule of 70 (70 ÷ rate)')));
+    note.textContent='Start: 1,000,000 people. Linear growth adds the same number of people every year. Exponential growth adds the same percentage every moment, so it keeps speeding up.';
+    if(touched>=3)api.done();
+  }
+  draw();
+};
+})();
+(function(){
+const PE=window.PE,el=PE.el,sv=PE.sv;
+
+/* Ch12: fair race, age adjustment */
+PE.acts.fair=function(root,api){
+  const ages=['Young (0–39)','Middle (40–64)','Older (65+)'];
+  const A={n:'Sunnyside',pop:[8000,1500,500],rate:[2,8,60]},B={n:'Goldenburg',pop:[3000,3000,4000],rate:[1.5,6,50]};
+  const std=[5000,2000,3000];
+  const crude=t=>t.pop.reduce((s,p,i)=>s+p*t.rate[i],0)/t.pop.reduce((a,b)=>a+b,0);
+  const adj=t=>std.reduce((s,p,i)=>s+p*t.rate[i],0)/std.reduce((a,b)=>a+b,0);
+  const holder=el('div'),fb=el('div',{class:'fb',role:'status','aria-live':'polite'});let mode=0,seen=new Set();
+  const tg=el('div',{class:'toggle'},['1. Crude rate','2. Rate for each age group','3. Fair (age-adjusted) rate'].map((t,i)=>el('button',{class:'btn',onclick:()=>{mode=i;draw();}},t)));
+  root.append(el('p',null,'Two towns race to be the healthiest. Death rates are deaths per 1,000 people per year. Sunnyside has many young people. Goldenburg has many older people.'),tg,holder,fb);
+  function draw(){
+    seen.add(mode);tg.querySelectorAll('.btn').forEach((b,i)=>b.classList.toggle('on',i===mode));holder.innerHTML='';
+    if(mode===0){
+      holder.append(PE.bars(420,220,[{l:A.n,v:crude(A),c:'#FFC93C'},{l:B.n,v:crude(B),c:'#7B5CFF'}],{vals:true,vf:v=>PE.fmt(v,1),label:'Crude death rates',ymax:26}));
+      fb.className='fb bad';fb.textContent='Crude rate = all deaths ÷ all people. Goldenburg looks much worse. But wait: is that fair?';
+    }else if(mode===1){
+      const rows=ages.map((a,i)=>'<tr><td>'+a+'</td><td>'+PE.fmt(A.pop[i])+'</td><td>'+A.rate[i]+'</td><td>'+PE.fmt(B.pop[i])+'</td><td>'+B.rate[i]+'</td></tr>').join('');
+      holder.append(el('table',{class:'tbl',html:'<tr><th>Age group</th><th>'+A.n+' people</th><th>'+A.n+' rate</th><th>'+B.n+' people</th><th>'+B.n+' rate</th></tr>'+rows}));
+      fb.className='fb good';fb.textContent='Look closely: at EVERY age, Goldenburg has the lower death rate! Goldenburg only looks worse because 40% of its people are older, and older people die more often everywhere.';
+    }else{
+      holder.append(PE.bars(420,220,[{l:A.n,v:adj(A),c:'#FFC93C'},{l:B.n,v:adj(B),c:'#7B5CFF'}],{vals:true,vf:v=>PE.fmt(v,1),label:'Age-adjusted death rates',ymax:26}));
+      fb.className='fb good';fb.textContent='Age adjustment gives both towns the SAME mix of ages (50% young, 20% middle, 30% older) before comparing. Now Goldenburg wins, as it should.';
+    }
+    if(seen.size===3)api.done();
+  }
+  draw();
+};
+
+/* Ch13: 100 babies life table */
+PE.acts.babies=function(root,api){
+  const ax=[0,1,5,10,20,30,40,50,60,70,80,90,100];
+  const L={today:[100,99.1,98.8,98.6,98.2,97.5,96.4,94.2,89.5,80.5,62,28,2],old:[100,78,64,60,57,53,48,42,34,22,10,2,0]};
+  let era='today',seen=new Set(),ages=new Set();
+  const lAt=(arr,x)=>{if(x>=100)return arr[arr.length-1];for(let i=0;i<ax.length-1;i++){if(x>=ax[i]&&x<=ax[i+1]){const f=(x-ax[i])/(ax[i+1]-ax[i]);return arr[i]+(arr[i+1]-arr[i])*f;}}return 0;};
+  const T=(arr,x)=>{let t=0;for(let y=Math.floor(x);y<100;y++)t+=(lAt(arr,y)+lAt(arr,y+1))/2;return t;};
+  const tg=el('div',{class:'toggle'},el('button',{class:'btn',onclick:()=>{era='today';draw();}},'🏥 A country today'),el('button',{class:'btn',onclick:()=>{era='old';draw();}},'📜 Long ago (like Halley’s town)'));
+  const grid=el('div',{class:'grid10','aria-hidden':'true'}),ro=el('div',{class:'readout'}),note=el('p');
+  const s=PE.slider(root,{label:'Age x',min:0,max:100,value:0,suf:' yrs',on:()=>{ages.add(s.get()>>3);draw();}});
+  root.prepend(el('p',null,'Imagine 100 babies born on the same day. A life table follows them as they grow up, using the death rates of one period. Slide the age and see how many are still alive.'),tg);
+  root.append(grid,ro,note);
+  function draw(){
+    seen.add(era);tg.querySelectorAll('.btn').forEach((b,i)=>b.classList.toggle('on',(i===0)===(era==='today')));
+    const arr=L[era],x=s.get(),lx=lAt(arr,x),alive=Math.round(lx);
+    grid.innerHTML='';for(let i=0;i<100;i++)grid.append(el('i',{class:i<alive?'':'x'}));
+    const ex=lx>0.5?T(arr,x)/lx:0,e0=T(arr,0)/100;
+    const q=lx>0?Math.max(0,(lx-lAt(arr,Math.min(100,x+5)))/lx):0;
+    ro.innerHTML='';
+    ro.append(el('div',{class:'r'},el('b',null,PE.fmt(lx,1)),el('span',null,'l(x): of 100 babies, alive at age '+x)),
+      el('div',{class:'r'},el('b',null,PE.fmt(100*q,1)+'%'),el('span',null,'q: chance of dying in the next 5 years')),
+      el('div',{class:'r'},el('b',null,PE.fmt(ex,1)),el('span',null,'e(x): years still to live on average')));
+    note.textContent='At birth, a baby in this world can expect about '+PE.fmt(e0,0)+' years of life (life expectancy at birth, e0). Green circles are alive, faded ones have died.';
+    if(seen.size===2&&ages.size>=3)api.done();
+  }
+  draw();
+};
+
+/* Ch14: incidence vs prevalence */
+PE.acts.sick=function(root,api){
+  const holder=el('div'),ro=el('div',{class:'readout'}),note=el('p');let moves=0;
+  const inc=PE.slider(root,{label:'New sick students each day',min:0,max:6,value:2,on:()=>{moves++;draw();}});
+  const dur=PE.slider(root,{label:'Days each student stays sick',min:1,max:8,value:3,on:()=>{moves++;draw();}});
+  const day=PE.slider(root,{label:'Look at day',min:1,max:14,value:10,on:()=>draw()});
+  root.prepend(el('p',null,'A class has 30 students. A cold goes around. ',el('b',null,'Incidence'),' means NEW cases. ',el('b',null,'Prevalence'),' means how many are sick right now.'));
+  root.append(holder,ro,note);
+  function draw(){
+    const i=inc.get(),d=dur.get(),t=day.get();
+    let sick=0;for(let s=Math.max(1,t-d+1);s<=t;s++)sick+=i;sick=Math.min(30,sick);
+    holder.innerHTML='';
+    const g=el('div',{class:'grid10',style:'grid-template-columns:repeat(10,1fr);max-width:420px'});
+    for(let k=0;k<30;k++)g.append(el('i',{class:k<sick?'s':''}));
+    holder.append(g);
+    ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,i),el('span',null,'incidence: new cases today')),el('div',{class:'r'},el('b',null,sick+' of 30'),el('span',null,'prevalence: sick right now')));
+    note.textContent='Pink = sick. Notice: when the cold lasts longer, prevalence goes up even if the number of new cases stays the same. Roughly, prevalence ≈ incidence × how long it lasts.';
+    if(moves>=4)api.done();
+  }
+  draw();
+};
+
+/* Ch15: TFR builder */
+PE.acts.tfr=function(root,api){
+  const g=['15–19','20–24','25–29','30–34','35–39','40–44','45–49'];
+  const def=[33,80,118,104,44,8,0.4];let touched=0,target=null;
+  const holder=el('div'),ro=el('div',{class:'readout'}),msg=el('div',{class:'fb',role:'status','aria-live':'polite'});
+  const ss=g.map((a,i)=>PE.slider(root,{label:'Mothers aged '+a,min:0,max:250,step:0.5,value:def[i],dec:1,on:()=>{touched++;draw();}}));
+  const mk=(lab,v)=>el('button',{class:'btn alt',onclick:()=>{target={v,lab};draw();}},lab);
+  root.prepend(el('p',null,'Each slider is the ',el('b',null,'age-specific birth rate'),': births in a year per 1,000 women of that age. The values start at an example from the book. Change them and watch the Total Fertility Rate.'),
+    el('p',null,el('b',null,'🎯 Challenge: '),'tap a target, then move the sliders until your TFR matches it (within 0.1).'),
+    el('div',{class:'toggle'},mk('🇬🇭 Ghana 2022: 3.9',3.9),mk('Greater Accra: 2.9',2.9),mk('North East Region: 6.6',6.6),mk('Ghana 1988: 6.4',6.4)));
+  root.append(holder,ro,msg);
+  function draw(){
+    const v=ss.map(s=>s.get());const sum=v.reduce((a,b)=>a+b,0),tfr=5*sum/1000;
+    holder.innerHTML='';holder.append(PE.bars(560,200,v.map((x,i)=>({l:g[i],v:x,c:'#FF5A87'})),{ymax:250,label:'Births per 1000 women by age of mother',fs:12}));
+    ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,PE.fmt(tfr,2)),el('span',null,'TFR = 5 × sum ÷ 1000 (children per woman)')),
+      el('div',{class:'r'},el('b',null,tfr>=2.1?'Replaces itself':'Below replacement'),el('span',null,'about 2.1 is the replacement level')));
+    if(target){
+      if(Math.abs(tfr-target.v)<0.1){msg.className='fb good';msg.textContent='🎯 Hit! Your TFR is '+PE.fmt(tfr,2)+', matching '+target.lab+'. (Source: 2022 Ghana Demographic and Health Survey.)';api.done();}
+      else{msg.className='fb bad';msg.textContent='Target '+target.v+'. Your TFR is '+PE.fmt(tfr,2)+(tfr<target.v?': raise some birth rates.':': lower some birth rates.');}
+    }else{msg.textContent='';}
+    if(touched>=4&&!target)api.done();
+  }
+  draw();
+};
+
+/* Ch16: own children method */
+PE.acts.ownchild=function(root,api){
+  const women=[{n:'Akosua',a:40,id:'A'},{n:'Efua',a:28,id:'B'}];
+  const kids=[{n:'Yaa',a:17,m:'A'},{n:'Kwame',a:10,m:'A'},{n:'Abena',a:6,m:'A'},{n:'Kojo',a:2,m:'A'},{n:'Esi',a:3,m:'B'}];
+  let i=0,res=[];
+  const box=el('div'),fb=el('div',{class:'fb',role:'status','aria-live':'polite'});
+  root.append(el('p',null,'A census does not always ask about births. But it lists everyone in a home and how they are related. Match each child to their mother, then work out how old the mother was at the birth. This is the ',el('b',null,'own-children method'),'.'),
+    el('div',{class:'panel'},el('b',null,'One household: '),'Akosua (40) and her sister Efua (28) live together with the children.'),box,fb);
+  function show(){
+    box.innerHTML='';fb.textContent='';
+    if(i>=kids.length){
+      box.append(el('p',null,'Done! The ages at birth: ',...res.map(r=>el('span',{class:'person'},r))),el('p',null,'Each child’s age tells us roughly WHEN the birth happened. Add up thousands of homes and we can estimate births per year and the mothers’ ages, even with no birth registers.'));api.done();return;}
+    const k=kids[i];
+    box.append(el('div',{class:'sortcard'},k.n+' is '+k.a+' years old. Who is '+k.n+'’s mother?'),
+      el('div',{class:'buckets'},women.map(w=>el('button',{class:'bucket',onclick:()=>{
+        if(w.id===k.m){fb.className='fb good';fb.textContent='✅ Yes. '+w.n+' is '+w.a+' now, so she was '+(w.a-k.a)+' when '+k.n+' was born.';res.push(w.n+' was '+(w.a-k.a));i++;setTimeout(show,1800);}
+        else{fb.className='fb bad';fb.textContent='Not quite. The census form says '+k.n+' is the '+(k.m==='B'?'niece of the head of household and the daughter of Efua.':'daughter or son of the head of household, Akosua.');}}},w.n+' ('+w.a+')'))));
+  }
+  show();
+};
+
+/* Ch17: net reproduction rate */
+PE.acts.nrr=function(root,api){
+  const holder=el('div'),ro=el('div',{class:'readout'});let touched=0;
+  const t=PE.slider(root,{label:'Children per woman (TFR)',min:1,max:6,step:0.1,value:2.5,dec:1,on:()=>{touched++;draw();}});
+  const s=PE.slider(root,{label:'Girls who live to be mothers',min:50,max:100,step:1,value:90,suf:'%',on:()=>{touched++;draw();}});
+  root.prepend(el('p',null,'Does each generation of women replace itself? We start with 100 baby girls and count their daughters.'));
+  root.append(el('div',{class:'toggle'},el('button',{class:'btn alt',onclick:()=>{t.set(3.9);touched++;draw();}},'🇬🇭 Ghana’s TFR 2022: 3.9'),el('button',{class:'btn alt',onclick:()=>{t.set(2.1);touched++;draw();}},'Replacement: 2.1'),el('button',{class:'btn alt',onclick:()=>{t.set(6.4);touched++;draw();}},'🇬🇭 Ghana 1988: 6.4')),holder,ro);
+  function draw(){
+    const grr=t.get()*0.4886,nrr=grr*s.get()/100;
+    const gens=[100,100*nrr,100*nrr*nrr,100*nrr*nrr*nrr];
+    holder.innerHTML='';holder.append(PE.bars(520,210,gens.map((v,i)=>({l:['Generation 1','Generation 2','Generation 3','Generation 4'][i],v,c:nrr>=1?'#2EC4A6':'#FF5A87'})),{vals:true,vf:v=>PE.fmt(v,0),label:'Baby girls in each generation',ymax:Math.max(150,gens[3]*1.1),fs:12}));
+    ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,PE.fmt(grr,2)),el('span',null,'GRR: daughters per woman if no girl ever died')),
+      el('div',{class:'r'},el('b',null,PE.fmt(nrr,2)),el('span',null,'NRR: daughters after deaths are counted')),
+      el('div',{class:'r'},el('b',null,nrr>1.02?'Growing':nrr<0.98?'Shrinking':'Just replacing'),el('span',null,'NRR = 1 means exact replacement')));
+    if(touched>=4)api.done();
+  }
+  draw();
+};
+
+/* Ch18: net migration by residual */
+PE.acts.residual=function(root,api){
+  let d,tries=0;
+  const box=el('div'),fb=el('div',{class:'fb',role:'status','aria-live':'polite'});
+  const inp=el('input',{type:'number',placeholder:'Net migration?','aria-label':'Your answer for net migration'});
+  const ck=el('button',{class:'btn',onclick:check},'Check');
+  const nw=el('button',{class:'btn alt',onclick:make},'New island');
+  root.append(el('p',null,'Nobody counted the people who moved in or out of Tolu Island. Can you work it out from the other numbers? This trick is called the ',el('b',null,'residual method'),' (what is left over).'),box,el('div',{class:'toggle'},inp,ck,nw),fb);
+  function make(){
+    const p0=50000+Math.round(Math.random()*50)*1000,b=8000+Math.round(Math.random()*40)*100,dd=3000+Math.round(Math.random()*30)*100,m=Math.round((Math.random()*2-0.6)*30)*100;
+    d={p0,b,dd,m,p1:p0+b-dd+m};inp.value='';fb.textContent='';
+    box.innerHTML='';box.append(el('table',{class:'tbl',html:'<tr><th>Population at start</th><th>Population at end</th><th>Births</th><th>Deaths</th></tr><tr><td>'+PE.fmt(d.p0)+'</td><td>'+PE.fmt(d.p1)+'</td><td>'+PE.fmt(d.b)+'</td><td>'+PE.fmt(d.dd)+'</td></tr>'}),
+      el('p',{class:'meta',style:'color:var(--muted)'},'Hint: total change − natural increase (births − deaths) = net migration.'));
+  }
+  function check(){
+    if(inp.value==='')return;tries++;const v=+inp.value;
+    if(v===d.m){fb.className='fb good';fb.textContent='✅ Right! Total change = '+PE.fmt(d.p1-d.p0)+', natural increase = '+PE.fmt(d.b-d.dd)+', so net migration = '+(d.m>=0?'+':'')+PE.fmt(d.m)+(d.m>=0?' (more people came in than left).':' (more people left than came in).');if(tries>=1)api.done();}
+    else{fb.className='fb bad';fb.textContent='Not yet. First: end − start = '+PE.fmt(d.p1-d.p0)+'. Then subtract births − deaths = '+PE.fmt(d.b-d.dd)+'.';}
+  }
+  make();
+};
+
+/* Ch20: housing unit method */
+PE.acts.housing=function(root,api){
+  const ro=el('div',{class:'readout'}),note=el('p');let touched=0;
+  const h=PE.slider(root,{label:'Homes counted by the building office',min:1000,max:20000,step:100,value:8000,on:()=>{touched++;draw();}});
+  const o=PE.slider(root,{label:'Homes with someone living in them',min:70,max:100,step:1,value:92,suf:'%',on:()=>{touched++;draw();}});
+  const p=PE.slider(root,{label:'People per occupied home (Ghana’s 2021 average: 3.6)',min:1.5,max:6,step:0.1,value:3.6,dec:1,on:()=>{touched++;draw();}});
+  root.prepend(el('p',null,'The last census was years ago, but the city kept counting new homes. This clue is called ',el('b',null,'symptomatic data'),': it “shows symptoms” of how many people live in a place. Build an estimate with the ',el('b',null,'housing unit method'),'.'));
+  root.append(ro,note);
+  function draw(){
+    const e=h.get()*o.get()/100*p.get();
+    ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,PE.fmt(e)),el('span',null,'estimated population')));
+    note.textContent='Estimate = homes × share occupied × people per home = '+PE.fmt(h.get())+' × '+o.get()+'% × '+PE.fmt(p.get(),1)+'. Other clues demographers use: births, deaths, school enrollment, tax returns, electricity hook-ups.';
+    if(touched>=4)api.done();
+  }
+  draw();
+};
+
+/* Ch21: cohort-component machine */
+PE.acts.project=function(root,api){
+  const f=PE.slider(root,{label:'Kids per adult in the middle group',min:0.5,max:2.2,step:0.05,value:0.95,dec:2,on:()=>draw()});
+  const sv1=PE.slider(root,{label:'Kids who survive to adulthood',min:70,max:100,step:1,value:97,suf:'%',on:()=>draw()});
+  const sv2=PE.slider(root,{label:'Adults who survive to grandparent age',min:50,max:100,step:1,value:92,suf:'%',on:()=>draw()});
+  const mg=PE.slider(root,{label:'New adults moving in each step',min:0,max:40,step:1,value:0,on:()=>draw()});
+  let alt=false,used=new Set();
+  const tg=el('div',{class:'toggle'},el('button',{class:'btn',onclick:()=>{alt=false;draw();}},'One projection'),el('button',{class:'btn',onclick:()=>{alt=true;draw();}},'Low, medium and high series'));
+  const holder=el('div'),note=el('p');
+  root.prepend(el('p',null,'Three age boxes: ',el('b',null,'Young (0–24)'),', ',el('b',null,'Adults (25–49)'),', ',el('b',null,'Grandparents (50–74)'),'. Every 25 years everyone moves up one box. Adults have babies, some people die, some people move in. That is the ',el('b',null,'cohort-component method'),'.'));
+  const pre=el('div',{class:'toggle'},el('button',{class:'btn alt',onclick:()=>{f.set(3.2);draw();}},'🇬🇭 Ghana 1988 (TFR 6.4 ÷ 2 = 3.2)'),el('button',{class:'btn alt',onclick:()=>{f.set(1.95);draw();}},'🇬🇭 Ghana 2022 (TFR 3.9 ÷ 2 = 1.95)'),el('button',{class:'btn alt',onclick:()=>{f.set(1.05);draw();}},'Replacement (2.1 ÷ 2 = 1.05)'));
+  root.append(tg,pre,holder,note);
+  function run(fert){
+    let y=100,a=100,g=80;const out=[[0,y+a+g]];
+    for(let s=1;s<=5;s++){const ny=a*fert,na=y*sv1.get()/100+mg.get(),ng=a*sv2.get()/100;y=ny;a=na;g=ng;out.push([s*25,y+a+g]);}
+    return out;
+  }
+  function draw(){
+    tg.querySelectorAll('.btn').forEach((b,i)=>b.classList.toggle('on',(i===1)===alt));
+    const fm=f.get();used.add(alt);
+    const ser=alt?[{pts:run(Math.max(0.3,fm-0.2)),color:'#FF5A87',label:'Low',dash:'8 6'},{pts:run(fm),color:'#7B5CFF',label:'Medium'},{pts:run(fm+0.2),color:'#2EC4A6',label:'High',dash:'8 6'}]:[{pts:run(fm),color:'#7B5CFF',label:'Projection'}];
+    holder.innerHTML='';holder.append(PE.lineChart(560,250,ser,{ymin:0,xl:'Years from now',label:'Projected total population (thousands)'}));
+    note.textContent='Start: 280 thousand pretend people. Tip: kids per adult is roughly the TFR divided by 2, so the Ghana buttons use real fertility rates. A projection says "IF these assumptions come true, THEN this happens." It cannot be wrong, but the assumptions can be. That is why agencies publish low, medium and high versions.';
+    if(used.size===2)api.done();
+  }
+  draw();
+};
+
+/* Ch22: Brass trick */
+PE.acts.brass=function(root,api){
+  const holder=el('div'),ro=el('div',{class:'readout'}),note=el('p');let t=0;
+  const ceb=PE.slider(root,{label:'Children ever born to 100 mothers aged 30–34',min:200,max:500,step:5,value:350,on:()=>{t++;draw();}});
+  const cs=PE.slider(root,{label:'Of those children, still alive',min:150,max:500,step:5,value:310,on:()=>{t++;draw();}});
+  root.prepend(el('p',null,'A country has no good death records. But a survey asked mothers two simple questions: How many children have you ',el('b',null,'ever had'),'? How many are ',el('b',null,'still alive'),'? William Brass showed this can reveal how many children die young.'));
+  root.append(holder,ro,note);
+  function draw(){
+    const e=ceb.get(),s=Math.min(cs.get(),e),dead=e-s,p=dead/e;
+    holder.innerHTML='';
+    const g=el('div',{class:'grid10',style:'max-width:420px'});
+    const per100=Math.round(p*100);
+    for(let i=0;i<100;i++)g.append(el('i',{class:i<per100?'s':''}));
+    holder.append(el('p',null,'If we picture 100 of these children, the pink ones have died:'),g);
+    ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,PE.fmt(100*p,1)+'%'),el('span',null,'proportion dead = 1 − alive ÷ ever born')),
+      el('div',{class:'r'},el('b',null,'≈ '+per100+' in 100'),el('span',null,'children die before about age 5')));
+    note.textContent='Children of mothers aged 30–34 are mostly between 0 and 15 years old, so their death share matches the chance of dying by about age 5. Younger mothers give shorter-term clues, older mothers longer-term ones. Demographers then match the result to a model life table.';
+    if(t>=3)api.done();
+  }
+  draw();
+};
+
+/* App A/B: model curves */
+PE.acts.curves=function(root,api){
+  const ax=[0,1,5,10,20,30,40,50,60,70,80,90];
+  const C={
+    A:{n:'Pattern A',c:'#FF5A87',l:[100,86,80,79,77,75,72,68,60,45,22,5]},
+    B:{n:'Pattern B',c:'#2EC4A6',l:[100,99,98.8,98.6,98,97,95.5,92,84,70,42,12]},
+    C:{n:'Pattern C',c:'#7B5CFF',l:[100,93,90,88,85,81,76,69,58,42,22,7]}
+  };
+  const towns=[['Many babies die before they turn 1, but people who get through childhood often live long.','A'],['Almost nobody dies young. Most people live past 70 and then deaths pile up.','B'],['Deaths are spread fairly evenly across life.','C']];
+  const svg=PE.lineChart(560,250,Object.keys(C).map(k=>({pts:ax.map((x,i)=>[x,C[k].l[i]]),color:C[k].c,label:C[k].n})),{ymin:0,ymax:105,xl:'Age',yl:'Survivors out of 100',label:'Three survival patterns'});
+  const fb=el('div',{class:'fb',role:'status','aria-live':'polite'});let ok=new Set();
+  root.append(el('p',null,'A model life table is a typical pattern of dying, built from many countries. When a place has little data, demographers borrow the best-fitting pattern. Match each mystery town to a curve.'),svg,
+    ...towns.map(t=>el('div',{class:'panel'},el('p',null,t[0]),el('div',{class:'toggle'},Object.keys(C).map(k=>el('button',{class:'btn',onclick:ev=>{
+      if(k===t[1]){ok.add(t[1]);ev.currentTarget.classList.add('mint');fb.className='fb good';fb.textContent='✅ '+C[k].n+' fits! '+(ok.size===3?'All matched.':'');if(ok.size===3)api.done();}
+      else{fb.className='fb bad';fb.textContent='Look at where that curve drops. Does it match the story?';}}},C[k].n))))),fb);
+};
+
+/* App C: sampling and interpolation */
+PE.acts.toolbox=function(root,api){
+  const tabs=el('div',{class:'toggle'}),box=el('div');let seen=new Set(),tab=0;
+  ['🫘 Sampling jar','📏 Filling the gap'].forEach((t,i)=>tabs.append(el('button',{class:'btn',onclick:()=>{tab=i;draw();}},t)));
+  root.append(tabs,box);
+  function jar(){
+    const truth=0.3,N=2000;let log=[];
+    const out=el('div',{class:'panel'}),ro=el('div',{class:'readout'});
+    const mk=n=>el('button',{class:'btn alt',onclick:()=>{let r=0;for(let i=0;i<n;i++)if(Math.random()<truth)r++;log.push({n,p:100*r/n});if(log.length>6)log.shift();show();seen.add('s');if(seen.size===2||log.length>=4)api.done();}},'Scoop '+n+' beans');
+    box.append(el('p',null,'A giant jar has 2,000 beans. 30% are red, but you do not know that. Scoop some beans and guess the share of red. Which scoop size is steadier?'),el('div',{class:'toggle'},mk(10),mk(50),mk(400)),out,ro);
+    function show(){out.innerHTML='';log.forEach(l=>out.append(el('span',{class:'person'},l.n+' beans → '+PE.fmt(l.p,0)+'% red')));ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,'30%'),el('span',null,'true share (secret!)')));}
+    show();
+  }
+  function interp(){
+    const P0=24658823,P1=30832019;
+    const s=PE.slider(box,{label:'Year',min:2010,max:2021,step:1,value:2015,on:()=>upd()});
+    const ro=el('div',{class:'readout'}),holder=el('div');
+    box.prepend(el('p',null,'Ghana counted its people in the 2010 census (24,658,823) and the 2021 census (30,832,019). What about the years in between? Filling the gap is called ',el('b',null,'interpolation'),'. (We round the census dates to 2010 and 2021.)'));
+    box.append(holder,ro);
+    function upd(){
+      const y=s.get(),t=(y-2010)/11,lin=P0+(P1-P0)*t,geo=P0*Math.pow(P1/P0,t);
+      const L=[],G=[];for(let k=0;k<=11;k++){L.push([2010+k,P0+(P1-P0)*k/11]);G.push([2010+k,P0*Math.pow(P1/P0,k/11)]);}
+      holder.innerHTML='';holder.append(PE.lineChart(560,230,[{pts:L,color:'#3DA5FF',label:'Straight line'},{pts:G,color:'#FF5A87',label:'Compound growth'}],{xmin:2010,xmax:2021,ymin:24000000,ymax:31500000,xfmt:v=>String(Math.round(v)),label:'Two ways to estimate Ghana between censuses'}));
+      ro.innerHTML='';ro.append(el('div',{class:'r'},el('b',null,PE.fmt(lin)),el('span',null,'straight-line guess for '+y)),el('div',{class:'r'},el('b',null,PE.fmt(geo)),el('span',null,'compound-growth guess')));
+      seen.add('i');if(seen.size===2)api.done();
+    }
+    upd();
+  }
+  function draw(){tabs.querySelectorAll('.btn').forEach((b,i)=>b.classList.toggle('on',i===tab));box.innerHTML='';if(tab===0)jar();else interp();}
+  draw();
+};
+
+/* App D: GIS + Snow */
+PE.acts.snow=function(root,api){
+  const W=540,H=320,r=PE.rng(1854);
+  const pumps=[{n:'Pump A',x:130,y:90},{n:'Pump B',x:290,y:170},{n:'Pump C',x:440,y:90}];
+  const houses=[];
+  for(let i=0;i<70;i++){const x=20+r()*(W-40),y=20+r()*(H-40);houses.push({x,y});}
+  houses.forEach(h=>{const d=pumps.map(p=>Math.hypot(h.x-p.x,h.y-p.y));const near=d.indexOf(Math.min(...d));h.near=near;
+    const dB=d[1];h.sick=r()<(dB<80?0.8:dB<130?0.25:0.04);});
+  const layers={roads:true,houses:true,sick:false,areas:false};
+  const holder=el('div'),fb=el('div',{class:'fb',role:'status','aria-live':'polite'}),tg=el('div',{class:'toggle'});
+  const names={roads:'🛣️ Roads (lines)',houses:'🏠 Homes (points)',sick:'🤒 Sick homes (points)',areas:'🟦 Pump areas (polygons)'};
+  Object.keys(names).forEach(k=>tg.append(el('button',{class:'btn on',onclick:ev=>{layers[k]=!layers[k];draw();}},names[k])));
+  root.append(el('p',null,'A map made of ',el('b',null,'layers'),' is what a GIS (Geographic Information System) does. In 1854 Dr. John Snow mapped sick homes and water pumps in London to find which pump spread cholera. Turn on the layers, then tap the pump you blame.'),tg,holder,fb);
+  function inArea(h,i){return h.near===i;}
+  function draw(){
+    tg.querySelectorAll('.btn').forEach((b,i)=>b.classList.toggle('on',layers[Object.keys(names)[i]]));
+    const svg=sv('svg',{viewBox:'0 0 '+W+' '+H,class:'chart',role:'img','aria-label':'Map with homes, roads and three water pumps'});
+    svg.append(sv('rect',{x:0,y:0,width:W,height:H,fill:'#E8F7E8',opacity:.5}));
+    if(layers.areas){const cols=['#3DA5FF','#FFC93C','#7B5CFF'];pumps.forEach((p,i)=>svg.append(sv('circle',{cx:p.x,cy:p.y,r:i===1?105:95,fill:cols[i],opacity:.22,stroke:cols[i],'stroke-width':3})));}
+    if(layers.roads){[[0,160,W,160],[0,60,W,60],[210,0,210,H],[380,0,380,H],[0,260,W,260]].forEach(l=>svg.append(sv('line',{x1:l[0],y1:l[1],x2:l[2],y2:l[3],stroke:'#9A8F7A','stroke-width':7,'stroke-linecap':'round',opacity:.7})));}
+    if(layers.houses)houses.forEach(h=>svg.append(sv('rect',{x:h.x-5,y:h.y-5,width:10,height:10,fill:'#fff',stroke:'#1D1B4B','stroke-width':2.2,rx:2})));
+    if(layers.sick)houses.filter(h=>h.sick).forEach(h=>svg.append(sv('circle',{cx:h.x,cy:h.y,r:7,fill:'#FF5A87',stroke:'#1D1B4B','stroke-width':2.5})));
+    pumps.forEach((p,i)=>{const g=sv('g',{style:'cursor:pointer',tabindex:0,role:'button','aria-label':'Blame '+p.n});
+      g.append(sv('circle',{cx:p.x,cy:p.y,r:15,fill:'#3DA5FF',stroke:'#1D1B4B','stroke-width':3.5}),sv('text',{x:p.x,y:p.y+5,'text-anchor':'middle','font-size':14},'💧'),sv('text',{x:p.x,y:p.y+34,'text-anchor':'middle','font-size':13},p.n));
+      const act=()=>choose(i);g.addEventListener('click',act);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')act();});svg.append(g);});
+    holder.innerHTML='';holder.append(svg);
+  }
+  function choose(i){
+    const counts=pumps.map((_,k)=>houses.filter(h=>h.near===k&&h.sick).length);
+    if(i===1){fb.className='fb good';fb.textContent='✅ Pump B! '+counts[1]+' sick homes live closest to it, against '+counts[0]+' for Pump A and '+counts[2]+' for Pump C. Snow’s map was one of the first uses of what we now call GIS.';api.done();}
+    else{fb.className='fb bad';fb.textContent=pumps[i].n+' only has '+counts[i]+' sick homes near it. Turn on the sick-homes layer and look for the crowd.';}
+  }
+  draw();
+};
+})();
+(function(){
+const M=window.PE.missions;
+M.push({id:'m01',zone:1,emoji:'🔍',title:'What is demography?',ch:'Chapter 1 · Introduction',badge:'Pattern Spotter',
+cards:[
+['🧩','People make patterns','One person’s life is hard to predict. But when you add up <b>thousands of births, deaths and moves</b>, clear patterns appear. <b>Demography</b> is the science of those patterns in human populations.','Weather is the same! You can’t say if it will rain on <i>your</i> head, but you can say how many rainy days a month will have.'],
+['❓','Four big questions','Demographers ask: <b>How many people are there?</b> (size) <b>Where do they live?</b> (distribution) <b>What are they like?</b> (age, boys and girls, jobs, school…) And <b>how and why is it changing?</b> (births, deaths, moving).'],
+['🇬🇭','Ghana is our classroom','All through this course we use real numbers from Ghana. For example, Ghana’s <b>2021 Population and Housing Census</b> counted <b>30,832,019 people</b>, up from 24,658,823 in 2010.'],
+['🗺️','Your map of this course','The book has four parts. <b>Part 1</b> (Chapters 2–10): size, place and who people are. <b>Part 2</b> (Chapters 11–19): the things that change a population. <b>Part 3</b> (Chapters 20–22): estimates and projections. <b>Part 4</b>: a toolbox, a glossary and a time line.'],
+['🚲','Momentum','A population is like a rolling bike. Today’s babies become tomorrow’s parents, so the past, present and future are tightly linked. And many countries have kept records for generations, so demographers have lots of clues.']
+],
+words:[['Demography','The scientific study of human populations: their size, where they live, who they are, and how they change.'],['Population','All the people who live in a particular place, such as a village, a country or the whole world.'],['Rate','A count compared with the size of a group, for example deaths per 1,000 people. It lets us compare big and small places fairly.'],['Ratio','One number divided by another, such as boys per 100 girls.']],
+act:{title:'Which question is it?',intro:'Each card is something a demographer might want to know. Tap the box it belongs to.',type:'sort',cfg:{
+buckets:[{k:'size',e:'🔢',label:'How many? (size)'},{k:'where',e:'📍',label:'Where? (distribution)'},{k:'who',e:'🧑‍🤝‍🧑',label:'Who? (age, sex…)'},{k:'change',e:'📈',label:'Change'}],
+items:[{t:'How many people live in Ghana? (The 2021 census said 30,832,019.)',k:'size',w:'Total headcount is population size.'},{t:'Which of Ghana’s 16 regions has the most people?',k:'where',w:'That is about where people live.'},{t:'How many people are kids and how many are grandparents?',k:'who',w:'Age is part of “who” people are.'},{t:'How many babies are born in Ghana in one year?',k:'change',w:'Births are one cause of change.'},{t:'Do more Ghanaians live in towns or in villages?',k:'where',w:'City versus village is distribution.'},{t:'Are there more girls or boys?',k:'who',w:'Sex is part of “who” people are.'},{t:'How many people moved from the Northern Region to Accra?',k:'change',w:'Moving is another cause of change.'},{t:'What is the total number of people in Kumasi?',k:'size',w:'The total is population size.'}]}},
+quiz:[{q:'Why can demographers find patterns even though nobody can predict one person’s life?',o:['Because adding up many people’s events shows clear patterns','Because they ask everyone for their plans','Because people never change their minds','Because computers can read minds'],a:0,w:'Individual events are unpredictable, but patterns emerge when many records are combined.'},{q:'Which of these is NOT one of the big demography questions?',o:['How many people are there?','Where do they live?','What is the best-tasting food?','How and why is the population changing?'],a:2,w:'Food taste is not a demography question. Size, place, composition and change are.'},{q:'What does “momentum” mean for a population?',o:['Babies today become the parents of tomorrow, linking past and future','Populations always grow quickly','People move fast','Counts never change'],a:0,w:'Population processes link the present with the past and the future in measurable ways.'},{q:'Ghana’s 2021 census counted 30,832,019 people. Which big question does that number answer?',o:['How many people are there? (size)','Where do people live?','Who are the people?','How fast is it changing?'],a:0,w:'A total headcount is population size.'}],
+take:'You are officially a pattern spotter! Next stop: where do population numbers actually come from?'});
+
+M.push({id:'m02',zone:1,emoji:'📚',title:'Where do the numbers come from?',ch:'Chapter 2 · Basic Sources of Statistics',badge:'Data Detective',
+cards:[
+['🏠','The census','A <b>census</b> tries to count <b>everyone</b> in a country at about the same time, usually every few years (often every 10). It gives us the big picture, even for tiny places. Ghana’s <b>2021 Population and Housing Census</b> was the sixth since independence.'],
+['📝','Surveys','A <b>survey</b> asks questions to a smaller <b>sample</b> of people chosen carefully. It is faster and cheaper than a census, and good for detailed topics like health or jobs. Ghana’s <b>2022 Demographic and Health Survey</b> (the seventh since 1988) asked a sample of households about births, children and health, and 98% of the women approached took part.'],
+['📜','Registration and records','Some numbers are written down as events happen: <b>vital statistics</b> are records of births, deaths and marriages. <b>Administrative records</b> (school lists, tax files…) were made for other reasons but can help too.'],
+['🕵️','Be a data detective','<b>Primary</b> data is what you collect yourself (costly but exactly what you need). <b>Secondary</b> data was collected by someone else (cheap, but made for another purpose). Always ask: <b>Is it valid</b> (measures what it says)? <b>Reliable</b> (measured the same way each time)? Is <b>privacy</b> protected? Avoid mystery numbers with no source.','Anyone can post statistics online. A good detective checks who made them and how.']
+],
+words:[['Census','A count of all the people in a country at one time, with questions about each person.'],['Survey','A study that asks questions to a sample, a smaller group chosen to stand for everyone.'],['Vital statistics','Records of births, deaths, marriages and divorces.'],['Primary data','Information collected by the person who will use it.'],['Secondary data','Information that was collected by someone else and is used again.'],['Validity','Whether numbers really measure what they claim to measure.'],['Reliability','Whether numbers are measured consistently.']],
+act:{title:'Pick the source',intro:'Which kind of data source is each clue describing?',type:'sort',cfg:{
+buckets:[{k:'census',e:'🏠',label:'Census'},{k:'survey',e:'📝',label:'Survey'},{k:'reg',e:'📜',label:'Birth and death registration'},{k:'admin',e:'🗂️',label:'Admin records'}],
+items:[{t:'Visits every household in Ghana during the 2021 census',k:'census',w:'Counting everyone is a census.'},{t:'The Ghana Demographic and Health Survey asks chosen households about children and health',k:'survey',w:'A chosen sample is a survey.'},{t:'A hospital reports each new baby to a government office',k:'reg',w:'Recording births as they happen is registration.'},{t:'A school’s list of enrolled students',k:'admin',w:'Made for running the school, but useful for counting kids.'},{t:'Every death certificate signed in a year',k:'reg',w:'Deaths recorded as they happen are vital statistics.'},{t:'A monthly poll of 3,000 people about their jobs',k:'survey',w:'A repeated sample is a survey.'}]}},
+quiz:[{q:'What is the main difference between a census and a survey?',o:['A census tries to count everyone; a survey asks a sample','A survey counts everyone; a census asks a sample','They are exactly the same','A census only counts animals'],a:0,w:'Censuses aim at everyone. Surveys use a sample.'},{q:'You use numbers that another agency collected for a different purpose. These are…',o:['Secondary data','Primary data','Fake data','Private data'],a:0,w:'Secondary data was collected by someone else, often for another purpose.'},{q:'A website gives population numbers but says nothing about how they were made. What should you do?',o:['Be careful and check the source before using them','Use them straight away','Add more numbers to them','Delete the website'],a:0,w:'Verify the origin and methods before trusting statistics.'},{q:'Which of these is a survey?',o:['The 2022 Ghana Demographic and Health Survey','The 2021 Population and Housing Census','A school’s enrollment list','A death certificate'],a:0,w:'It interviews a sample of households. The census tries to count everyone.'}],
+take:'Detective skills unlocked! Now let’s see how a census actually happens.'});
+
+M.push({id:'m03',zone:1,emoji:'🧑‍💼',title:'Census day!',ch:'Chapter 3 · Collection and Processing of Demographic Data',badge:'Census Captain',
+cards:[
+['📏','Four rules of a real census','A true census (1) lists <b>each person individually</b>, (2) covers <b>everyone</b> in the area, (3) counts people <b>at about the same time</b>, and (4) is <b>repeated regularly</b>. Experts call these individual enumeration, universality, simultaneity and periodicity.'],
+['🧮','Why individual counts matter','Old censuses sometimes just tallied “men, women, children” in each family. You cannot learn much from that. If you write down each person’s age, sex and more, you can mix those facts later, like asking “how many girls aged 6 go to school?”'],
+['🇬🇭','Ghana’s digital census','Ghana’s <b>2021 Population and Housing Census</b> was its first <b>fully digital</b> census. Counting ran from 28 June to 11 July 2021. It was a <b>de facto</b> census: people were counted where they were.'],
+['🛠️','Before, during and after','<b>Before:</b> plan, draw maps, test the questions, hire and train counters. <b>During:</b> visit every home. <b>After:</b> check forms for mistakes (editing), add them up into tables, publish. Many countries also check whom they missed.'],
+['🐣','Vital registration','Births and deaths are recorded by law in many places. This only works if people <b>report</b> them. If reporting is optional, some events are missed, so the records are incomplete.','Surveys work differently: they use random sampling, where every person has a known chance of being picked.']
+],
+words:[['Enumeration','The act of counting and listing people one by one.'],['Universality','Covering every person in the area, with nobody left out.'],['Simultaneity','Counting everyone as of the same time, so no one is counted twice or missed.'],['Sampling','Choosing a smaller group to study so it represents the whole.'],['Editing','Checking collected forms for mistakes or missing answers and fixing them.']],
+act:{title:'Run a census in the right order',intro:'A census has to happen in the right order. Tap the steps from first to last.',type:'order',cfg:{items:['Plan the census and draw the maps','Test the questions and train the counters','Visit every home and count the people','Check the forms for mistakes and fix them','Add everything up into tables','Publish the results for everyone']}},
+quiz:[{q:'Why is it important that a census counts everyone at about the same time?',o:['So people are not missed or counted twice as they move around','So it is more exciting','So it costs more','So nobody has to answer'],a:0,w:'Simultaneity prevents people being counted twice or missed.'},{q:'What is the problem with just tallying “men, women and children” per family?',o:['You cannot mix characteristics later, like age and school','It is too slow','It uses too much paper','Nothing is wrong'],a:0,w:'Group tallies cannot be cross-classified, so tabulation is just summation.'},{q:'What happens if birth registration is voluntary?',o:['Some births are missed, so records are incomplete','All births are recorded perfectly','Nobody is born','The census is wrong'],a:0,w:'When registration is voluntary rather than required, completeness suffers.'},{q:'What was special about Ghana’s 2021 census?',o:['It was Ghana’s first fully digital census','It counted only cities','It was done only by phone','It counted only adults'],a:0,w:'The 2021 PHC was the first fully digital census in Ghana.'}],
+take:'Census Captain, reporting for duty! Next: how do we know the total headcount is right?'});
+
+M.push({id:'m04',zone:1,emoji:'🧮',title:'How many people are here?',ch:'Chapter 4 · Population Size',badge:'Headcount Hero',
+cards:[
+['🔢','Size comes first','The <b>size of a population</b> is usually the first thing a government wants to know. Long ago, counts were for taxes and armies, so women, children and some groups were often left out. Modern censuses try to include everyone.'],
+['🏠','Who counts as “here”?','<b>De facto:</b> count everyone who is <b>physically present</b> on census night. <b>De jure:</b> count people who <b>belong</b> to the place by usual or legal residence. Most censuses in Africa, Asia and South America are de facto; the United States uses de jure. For a whole country the difference is small, but for towns it can be big. Ghana’s 2021 census was a de facto count.'],
+['🫥','Missed and double-counted','Even good censuses <b>miss some people</b> (undercount) and count a few twice (overcount). To measure this, agencies do a <b>post-enumeration survey</b>: a second, independent count of a sample, then they match people one by one.'],
+['🐟','The fish trick','If you tag 40 fish, mix them back, and later catch 40 fish and find 10 tagged, then tagged fish are 1/4 of the pond. So the pond has about 160 fish. Demographers use this “<b>dual-system estimation</b>”: N = (people in count 1 × people in count 2) ÷ people found in both.','The trick only works if both counts are independent, like two nets thrown separately.']
+],
+words:[['De facto','A count of people who are physically present in an area at the census time.'],['De jure','A count of people who belong to an area by legal or usual residence.'],['Undercount','Missing people who should have been counted.'],['Post-enumeration survey','A second independent count of a sample, matched with the census to measure mistakes.'],['Dual-system estimation','Estimating a total by matching two independent counts, like tag-and-recapture.']],
+act:{title:'Tag and recapture the pond',intro:'Estimate how many fish are in the pond without counting them all.',type:'capture'},
+quiz:[{q:'You tag 40 fish. Later you catch 40 fish and 8 are tagged. About how many fish are in the pond?',o:['200','80','320','48'],a:0,w:'40 × 40 ÷ 8 = 200.'},{q:'Ghana’s 2021 census was de facto. A visitor from Tamale is sleeping in Accra on census night. Where is the visitor counted?',o:['In Accra, where they are','In Tamale, where they usually live','In both places','Nowhere'],a:0,w:'A de facto census counts people where they are at the census time.'},{q:'What is a post-enumeration survey for?',o:['To check how many people the census missed or double-counted','To count animals','To print the results','To replace the census'],a:0,w:'It is an independent check used to estimate coverage errors.'}],
+take:'You can now estimate a hidden total with tags and nets. That is real demography!'});
+
+M.push({id:'m05',zone:1,emoji:'🗺️',title:'Where do people live?',ch:'Chapter 5 · Population Distribution: Geographic Areas',badge:'Map Master',
+cards:[
+['🏘️','Crowded and empty places','In most countries people are not spread out evenly. Some places are packed, others almost empty. Planners, businesses and governments need numbers for <b>regions and neighbourhoods</b>, not just for the whole country. In Ghana there were <b>103 people per km²</b> in 2010 and <b>129</b> in 2021.'],
+['🧱','Countries have pieces','Ghana has <b>16 regions</b> (it had 10 until 2019) and <b>261 districts</b>. Greater Accra is the smallest region by area, yet in 2021 it became the most populous with <b>5,455,692</b> people, just ahead of Ashanti (5,440,463). Region sizes vary hugely around the world: the book notes about 1,355 people on average per division in the Cook Islands versus 37.7 million in China.'],
+['🏙️','Cities are bigger than their borders','People live in a city but may work in the next town. A <b>metropolitan area</b> groups a central city with the places closely tied to it by commuting and trade.'],
+['⚖️','Balance point and density','<b>Density</b> is people per square kilometre (or mile). The <b>center of population</b> is the balance point of a map if every person were a little equal weight. It moves over time as people move.']
+],
+words:[['Civil division','An official piece of a country, like a province, region, district or state.'],['Metropolitan area','A big city together with nearby places that are closely linked to it.'],['Population density','The number of people per unit of land area.'],['Center of population','The balance point of the map if every person were a weight.']],
+act:{title:'Find the center of population',intro:'Where would this island balance?',type:'centerpin'},
+quiz:[{q:'Population density tells us…',o:['How many people live per unit of area','How old people are','How many babies are born','Which country is richest'],a:0,w:'Density is population divided by area.'},{q:'Which region became Ghana’s most populous in the 2021 census?',o:['Greater Accra','Ashanti','Northern','Volta'],a:0,w:'Greater Accra had 5,455,692 people, just ahead of Ashanti with 5,440,463.'},{q:'What pulls the center of population toward a place?',o:['Lots of people living there','Having a big park','Being near the sea','Having a long name'],a:0,w:'The center is weighted by the number of people, so crowded places pull harder.'},{q:'Ghana’s density rose from 103 to 129 people per km² between 2010 and 2021. What does that mean?',o:['More people live on each square kilometre, on average','Ghana got bigger','Fewer people live in Ghana','Nothing changed'],a:0,w:'Density is people divided by land area, so it rises when the population grows.'}],
+take:'You can find the balance point of a nation. Not bad for a 10-year-old!'});
+
+M.push({id:'m06',zone:1,emoji:'🏙️',title:'City or countryside?',ch:'Chapter 6 · Population Distribution: Classification of Residence',badge:'Urban Expert',
+cards:[
+['🏡','Urban and rural','Statisticians sort places into <b>urban</b> (city-like) and <b>rural</b> (countryside). But there is no single rule. Countries use size, density, the kinds of jobs people do, or whether a place has a local government.'],
+['🔀','Same word, different rule','Ghana calls a locality <b>urban</b> when it has <b>5,000 or more people</b>. By that rule 50.9% of Ghanaians (12.5 million) were urban in 2010 and <b>56.7%</b> (17,472,530 people) in 2021. Other countries use other rules: about 96% of Kuwait’s people count as urban but only about 17.6% in Papua New Guinea. And when the United States changed its definition in 1950, its urban population for that year jumped from 90.1 million to 96.8 million with no one moving at all!','Rural is often just “whatever is not urban”.'],
+['📊','Size classes','Towns can be sorted by size. In India between 1981 and 1991, the biggest class (100,000 people or more) grew by about 47%, adding nearly 45 million people.'],
+['📐','Measuring how spread out we are','Demographers use measures like the <b>concentration index (Gini)</b> to show how unevenly people are spread, the <b>index of dissimilarity</b> to compare two groups’ spread, and the <b>rank-size rule</b> (the 2nd biggest city is often about half the size of the biggest).']
+],
+words:[['Urban','Places classed as city-like. The exact rule differs from country to country.'],['Rural','Places that are not urban, such as countryside and small villages.'],['Size class','A group of places of similar population size.'],['Concentration','How unevenly people are spread over places.'],['Gini ratio','A number that measures how unequal a spread is. 0 means perfectly even.']],
+act:{title:'Move the urban line',intro:'See how the “percent urban” changes when only the rule changes.',type:'threshold'},
+quiz:[{q:'Country A calls a place urban at 2,500 people. Country B uses 20,000. Which statement is likely true?',o:['Country A will report a higher percent urban for the same places','Country B will report a higher percent urban','They will always match','Neither can have urban places'],a:0,w:'A lower threshold makes more places count as urban.'},{q:'How is “rural” often defined?',o:['Everything that is not urban','Only farms','Places with no people','The biggest cities'],a:0,w:'Rural is often a leftover category.'},{q:'What does a Gini-type concentration measure show?',o:['How unevenly people are spread across places','How tall people are','How fast cities grow','How many schools exist'],a:0,w:'It measures concentration of the population.'},{q:'Ghana’s 2021 census found 17,472,530 urban dwellers out of 30,832,019 people. About what percent is urban?',o:['56.7%','43.3%','17.5%','30.8%'],a:0,w:'17,472,530 ÷ 30,832,019 × 100 ≈ 56.7%. Ghana counts places with 5,000 or more people as urban.'}],
+take:'You now know why “percent urban” needs a footnote. Sharp eyes!'});
+
+M.push({id:'m07',zone:1,emoji:'🔺',title:'Age and sex pyramids',ch:'Chapter 7 · Age and Sex Composition',badge:'Pyramid Builder',
+cards:[
+['🎂','Age and sex are superstars','Almost every demographic question needs age and sex. Schools, hospitals, jobs, voting and food all depend on how many people there are at each age, and of each sex.'],
+['⚖️','Boys and girls','The <b>sex ratio</b> is the number of males per 100 females. In Ghana in 2021 there were 15,182,459 males and 15,610,149 females, a sex ratio of about <b>97</b>. (In Venezuela in 1990 it was 99.3.) The <b>masculinity proportion</b> is the share of the population that is male.'],
+['🔺','The pyramid','A <b>population pyramid</b> shows males on one side and females on the other, with the youngest at the bottom. A wide bottom means many children. Almost straight sides mean a steady population. A wide top means an older population. Wars and baby booms leave bumps and dents.'],
+['🧒🧓','Dependency ratio','Children and older people usually depend on working-age people. The <b>dependency ratio</b> is (people under 15 + people 65 and over) ÷ (people 15 to 64) × 100. A <b>median age</b> splits the population in half: half are younger, half are older. Ghana in 2021: <b>35.3%</b> were aged 0–14, <b>60.4%</b> aged 15–64 and <b>4.3%</b> aged 65 and over, a dependency ratio of about <b>66</b>.']
+],
+words:[['Sex ratio','Males per 100 females.'],['Age pyramid','A graph showing how many people there are at each age, separately for males and females.'],['Dependency ratio','People too young or too old to work, per 100 working-age people.'],['Median age','The age that splits a population in two equal halves.']],
+act:{title:'Explore three pyramids',intro:'Tap each country and watch how the shape changes the numbers.',type:'pyramid'},
+quiz:[{q:'A pyramid with a very wide bottom and a narrow top tells us the country has…',o:['Many children and fewer older people','Mostly grandparents','Exactly equal ages','No people'],a:0,w:'A wide base means a young population.'},{q:'Ghana in 2021: 15,182,459 males and 15,610,149 females. About what is the sex ratio?',o:['97 males per 100 females','103 males per 100 females','50 males per 100 females','15 males per 100 females'],a:0,w:'15,182,459 ÷ 15,610,149 × 100 ≈ 97.3.'},{q:'20 children, 10 older adults and 60 working-age people. What is the dependency ratio?',o:['50 per 100','30 per 100','20 per 100','100 per 100'],a:0,w:'(20 + 10) ÷ 60 × 100 = 50.'},{q:'Ghana 2021: 10,890,453 children (0–14), 18,619,021 people aged 15–64, and 1,322,545 aged 65+. What is the dependency ratio?',o:['About 66 per 100','About 35 per 100','About 4 per 100','About 100 per 100'],a:0,w:'(10,890,453 + 1,322,545) ÷ 18,619,021 × 100 ≈ 65.6.'}],
+take:'You can read a country’s age story from one picture. Next, let’s catch people fibbing about age!'});
+
+M.push({id:'m08',zone:1,emoji:'🕵️',title:'The age-heaping detective',ch:'Chapter 7 · Age and Sex Composition (checking the data)',badge:'Age Detective',
+cards:[
+['🔟','People love round numbers','When asked their age, many people say numbers ending in <b>0 or 5</b> (like 30 or 35). Others guess or do not know their birthday. This pile-up is called <b>age heaping</b> or <b>digit preference</b>.'],
+['⚠️','Why it matters','Age is used in nearly everything: death rates, birth rates, school plans, population projections. If ages are wrong, many results are wrong too.'],
+['🔧','Detective tools','<b>Whipple’s index</b> checks how often ages end in 0 or 5. <b>Myers’ blended index</b> checks all ten ending digits. Demographers also use accuracy indexes (like the UN age-sex index) and look for a zigzag pattern in the pyramid.'],
+['🩹','Fixing it','Smoothing methods spread out the heaps. Unknown ages are shared out in proportion to known ones. And census counts are compared with births, deaths and other data to see what is missing at each age.']
+],
+words:[['Age heaping','Too many people reporting ages that end in the same digits, such as 0 and 5.'],['Digit preference','A habit of favouring certain last digits when reporting a number.'],['Whipple’s index','A measure of how much ages ending in 0 or 5 are over-reported.'],['Myers’ index','A measure of preference for each ending digit from 0 to 9.']],
+act:{title:'Catch the suspicious ages',intro:'Find the ages with suspiciously tall bars.',type:'heaping'},
+quiz:[{q:'What is age heaping?',o:['Too many people reporting ages ending in 0 or 5','People growing taller','A very big family','A census error in counting homes'],a:0,w:'Digit preference piles people at round ages.'},{q:'If ages are honest, about what share of people should report an age ending in 0 or 5?',o:['About 20%','About 50%','About 90%','About 2%'],a:0,w:'Two of ten ending digits is one-fifth, or 20%.'},{q:'Why do demographers worry about wrong ages?',o:['Almost every measure uses age','Ages are secret','Nobody uses age','It makes pyramids colourful'],a:0,w:'Rates, projections and plans all depend on correct ages.'}],
+take:'Detective badge earned! You can spot a fibbing pyramid.'});
+
+M.push({id:'m09',zone:1,emoji:'🌈',title:'Who decides who we are?',ch:'Chapter 8 · Racial and Ethnic Composition',badge:'Fair Counter',
+cards:[
+['🗣️','People describe themselves','In many censuses, people choose the group or groups they belong to. This is called <b>self-identification</b>. It is more respectful than having a counter decide for them.'],
+['🔄','Categories are made by societies','The list of groups on a form is designed by a society and it <b>changes over time</b>. Some countries ask about “origin” in a separate question, and some now let people tick <b>more than one</b> group.'],
+['🧬','Other ways to describe a population','Besides group identity, censuses ask about <b>ancestry</b>, <b>language</b> spoken (mother tongue), <b>country of birth</b> (foreign-born), and <b>citizenship</b>. Together they describe how diverse a country is. Ghana’s 2021 census asked about topics such as <b>ethnicity</b>, <b>religion</b> and <b>place of birth</b>.'],
+['📝','Wording matters','How a question is worded, which choices appear, and whether you can pick more than one can all change the results. So demographers write careful rules for combining or comparing categories, especially across different census years.']
+],
+words:[['Self-identification','People answering questions about their own group instead of someone else deciding.'],['Ancestry','The origins of a person’s family, such as the places their ancestors came from.'],['Mother tongue','The language a person first learned at home.'],['Foreign-born','People born in a different country from where they now live.']],
+act:{title:'Same people, different form',intro:'Count the same 12 people on two different census forms.',type:'zog'},
+quiz:[{q:'Why do the counts change between Form A and Form B?',o:['Because the question lets people choose differently','Because people moved','Because the people changed','Because the bars shrank'],a:0,w:'The question design changes how people can answer, and so the counts.'},{q:'Self-identification means…',o:['People tell the census which group(s) they belong to','The counter guesses','The government decides','Everyone is in one group'],a:0,w:'People describe themselves.'},{q:'Why is comparing group counts across many census years tricky?',o:['Categories and wording can change over time','People forget how to count','Censuses have no groups','Years are different lengths'],a:0,w:'Category lists and question wording change between censuses.'},{q:'Which of these topics did Ghana’s 2021 census ask about?',o:['Ethnicity, religion and place of birth','Favourite colour','Shoe size','Favourite football club'],a:0,w:'Censuses collect characteristics such as ethnicity, religion and birth place.'}],
+take:'You know that how we ask changes what we find. That is a big lesson for any scientist!'});
+
+M.push({id:'m10',zone:1,emoji:'💍',title:'Marriage and households',ch:'Chapter 9 · Marriage, Divorce, and Family Groups',badge:'Family Mapper',
+cards:[
+['👫','Marital status','A census records each person’s <b>marital status</b>: never married, married, widowed or divorced. This tells us a status at one moment. Separately, registration records <b>events</b>: marriages and divorces that happen during a year.'],
+['📈','Rates and shares','Demographers compute rates such as marriages per 1,000 people, and shares such as the <b>percentage never married</b> by age group. Later marriage shows up as a higher “never married” share at young adult ages.'],
+['🏠','Household or family?','A <b>household</b> is everybody who lives together in one housing unit, related or not. A <b>family</b> is a group related by blood, marriage or adoption. Some people live in <b>group quarters</b> such as dorms, barracks or care homes.'],
+['🇬🇭','Ghana’s shrinking households','The average household in Ghana had <b>4.4</b> people in 2010 and <b>3.6</b> in 2021. Urban households fell from 4.1 to 3.3 people and rural ones from 5.0 to 4.0.'],
+['📏','Definitions change','Countries define families and households differently, and definitions can change from one census to the next. That limits how well we can compare over time and across countries.']
+],
+words:[['Marital status','Whether a person is never married, married, widowed or divorced.'],['Nuptiality','Marriage patterns in a population: how many marry, and when.'],['Household','All the people living together in one home.'],['Family','People in a household who are related by blood, marriage or adoption.'],['Group quarters','Places such as dorms or nursing homes where many unrelated people live.']],
+act:{title:'Household, family, or group quarters?',intro:'Sort each living arrangement.',type:'sort',cfg:{
+buckets:[{k:'hh',e:'🏠',label:'Household, not a family'},{k:'fam',e:'👨‍👩‍👧',label:'Family household'},{k:'gq',e:'🏫',label:'Group quarters'}],
+items:[{t:'Two friends share an apartment',k:'hh',w:'They share a home but are not related.'},{t:'Mum, dad and two children live together',k:'fam',w:'Related people in one home form a family household.'},{t:'A grandmother lives alone',k:'hh',w:'She is a one-person household. One person is not a family.'},{t:'Students living in a university dorm',k:'gq',w:'Dorms are group quarters.'},{t:'An aunt and her nephew share a house',k:'fam',w:'They are related by family ties.'},{t:'Residents of a nursing home',k:'gq',w:'Care homes are group quarters.'},{t:'A married couple with no children',k:'fam',w:'A married couple is a family.'}]}},
+quiz:[{q:'Two unrelated roommates share a flat. What is this?',o:['A household but not a family','A family','Group quarters','A census'],a:0,w:'They live in one housing unit but are not related.'},{q:'A census says 30% of people aged 25–29 have “never married”. Which kind of fact is this?',o:['Marital STATUS at one point in time','A marriage EVENT','A birth rate','A death rate'],a:0,w:'Status counts people in a category at the census date.'},{q:'Why can family statistics be hard to compare across countries?',o:['Definitions of family and household differ','Families are the same everywhere','Countries do not have families','Only names differ'],a:0,w:'Definitions differ and change over time.'},{q:'Ghana’s average household size fell from 4.4 (2010) to 3.6 (2021). By how many people?',o:['0.8','1.8','8','0.08'],a:0,w:'4.4 − 3.6 = 0.8 fewer people per household, on average.'}],
+take:'Family Mapper! You can tell the difference between a house, a household and a family.'});
+
+M.push({id:'m11',zone:1,emoji:'🎓',title:'School, work and money',ch:'Chapter 10 · Educational and Economic Characteristics',badge:'Work Whiz',
+cards:[
+['📖','Education numbers','<b>Literacy</b> asks if a person can read and write. <b>School enrollment</b> asks who is attending school. <b>Educational attainment</b> asks the highest level someone completed. Each tells a different story.'],
+['👷','The labor force','The <b>labor force</b> = people who are <b>employed</b> + people who are <b>unemployed</b> (without a job but looking for one). People not working and not looking, such as students, retirees and full-time caregivers, are <b>not in the labor force</b>. Ghana had 18,619,021 people of working age (15–64) in 2021, or 60.4% of the population.','Unemployed does not mean “no job”. It means no job AND looking for one.'],
+['🧰','What kind of work?','<b>Occupation</b> is the kind of work someone does (teacher, driver). <b>Industry</b> is what the business does (education, transport). Countries use standard lists to classify both.'],
+['💰','Money and poverty','Censuses and surveys also measure <b>income</b>, <b>wealth</b> (assets such as a home) and <b>poverty</b>: families whose resources fall below a <b>poverty line</b> needed to buy basics. Ratios compare working people to those who depend on them.']
+],
+words:[['Literacy','The ability to read and write.'],['School enrollment','Being signed up and attending school.'],['Educational attainment','The highest level of schooling a person has completed.'],['Labor force','People who are working or actively looking for work.'],['Poverty line','An income level below which a family cannot afford basic needs.']],
+act:{title:'Who is in the labor force?',intro:'Sort each person into the right box.',type:'sort',cfg:{
+buckets:[{k:'emp',e:'🛠️',label:'Employed'},{k:'unemp',e:'🔎',label:'Unemployed (looking)'},{k:'out',e:'🏠',label:'Not in labor force'}],
+items:[{t:'Efia bakes bread at a bakery full-time',k:'emp',w:'She has a job.'},{t:'Kofi has no job and applies for work every day',k:'unemp',w:'No job, but actively looking: unemployed.'},{t:'Akua, 12, is a full-time student',k:'out',w:'Children and students are not in the labor force.'},{t:'Mr. Boateng, 70, is retired',k:'out',w:'Retired people are not working or looking.'},{t:'Abena works part-time as a cashier',k:'emp',w:'Part-time work still counts as employed.'},{t:'Esi looks after her young children at home full-time',k:'out',w:'Unpaid home care is outside the labor force definition.'},{t:'Yaw lost his job last month and is interviewing',k:'unemp',w:'He is without work and searching.'}]}},
+quiz:[{q:'There are 60 employed and 10 unemployed people. What is the labor force?',o:['70','60','10','50'],a:0,w:'Labor force = employed + unemployed = 70.'},{q:'Which asks “What is the highest grade you finished?”',o:['Educational attainment','School enrollment','Literacy','Occupation'],a:0,w:'Attainment is the highest level completed.'},{q:'What is a poverty line?',o:['A level of resources below which basic needs cannot be met','A line on a map','The richest people','A school rule'],a:0,w:'It is a threshold for the resources needed to buy necessities.'},{q:'Ghana had 18,619,021 people aged 15–64 in 2021, out of 30,832,019. What share is that?',o:['About 60%','About 35%','About 4%','About 90%'],a:0,w:'18,619,021 ÷ 30,832,019 × 100 ≈ 60.4%.'}],
+take:'Zone 1 done! You can count a country, place it on a map and describe who lives there. Now: why does the number keep changing?'});
+})();
+(function(){
+const M=window.PE.missions;
+M.push({id:'m12',zone:2,emoji:'🛁',title:'The population bathtub',ch:'Chapter 11 · Population Change',badge:'Change Champion',
+cards:[
+['➖','Measuring change','Population change is just <b>later size − earlier size</b>. The <b>percent change</b> divides that change by the <b>earlier</b> size and multiplies by 100. Using the earlier size matches the question “how fast did it grow from where it started?” Ghana had 24,658,823 people in 2010 and 30,832,019 in 2021: a change of 6,173,196, or about <b>25.0%</b>.'],
+['🚧','Three traps','Be careful to compare like with like. Watch out if (1) the <b>borders</b> of the area changed, (2) the <b>definition</b> of who is counted changed, or (3) the <b>completeness</b> of the count changed.'],
+['🚰','Four taps','Only four things change a population: <b>births</b> and <b>immigration</b> (people moving in) add; <b>deaths</b> and <b>emigration</b> (people moving out) subtract. Births minus deaths is <b>natural increase</b>. Immigrants minus emigrants is <b>net migration</b>.'],
+['⚖️','The balancing equation','<b>New population = old population + births − deaths + immigrants − emigrants.</b> It works like a bathtub: water in, water out, and the level is the population.']
+],
+words:[['Natural increase','Births minus deaths. It can be negative, which is called natural decrease.'],['Immigration','People moving into an area from another country.'],['Emigration','People moving out of an area to another country.'],['Net migration','Immigrants minus emigrants.'],['Percent change','Change divided by the earlier size, times 100.']],
+act:{title:'Fill and drain the tub',intro:'Set the four taps, then run some years and watch the population level.',type:'bathtub'},
+quiz:[{q:'A town grows from 20,000 to 25,000. What is the percent change?',o:['25%','20%','5%','125%'],a:0,w:'Change = 5,000. 5,000 ÷ 20,000 × 100 = 25%.'},{q:'Births 300, deaths 100, immigrants 50, emigrants 150. What is the total change?',o:['+100','+200','−100','+300'],a:0,w:'300 − 100 + 50 − 150 = +100.'},{q:'Which is a reason you cannot compare a town’s size over time directly?',o:['Its borders changed','It got a new mayor','It rained','It is a nice town'],a:0,w:'Changes in territory make counts non-comparable.'},{q:'Ghana grew from 24,658,823 (2010) to 30,832,019 (2021). About what percent change?',o:['25%','6%','20%','125%'],a:0,w:'Change = 6,173,196. 6,173,196 ÷ 24,658,823 × 100 ≈ 25.0%.'}],
+take:'You hold the four taps of every population in the world!'});
+
+M.push({id:'m13',zone:2,emoji:'📈',title:'How fast do populations grow?',ch:'Chapter 11 · Population Change (growth patterns)',badge:'Growth Guru',
+cards:[
+['🪜','Linear: stairs','<b>Linear growth</b> adds the <b>same number</b> of people every year, like climbing steps of equal height.'],
+['🐇','Geometric and exponential: rabbits','<b>Geometric</b> growth adds the <b>same percent</b> each year, with the growing total adding more each time (like compound interest). <b>Exponential</b> growth does the same but all the time, not just once a year.'],
+['⏱️','Doubling time','How long to double? <b>t = 0.693 ÷ r</b> (r is the yearly rate as a decimal). Brazil’s 1.35% yearly growth between 1991 and 1996 gives 0.693 ÷ 0.0135 ≈ <b>51.4 years</b>. A quick shortcut is 70 ÷ the percent rate. Ghana grew about <b>2.1% a year</b> from 2010 to 2021, its slowest rate on record, so doubling would take about 33 years.'],
+['🛑','Limits','No population can grow forever. The <b>logistic curve</b> starts like an exponential, then slows down as it nears a ceiling called the <b>carrying capacity</b>.']
+],
+words:[['Linear growth','Growth by the same amount in each period.'],['Geometric growth','Growth by the same percent in each period, compounded once per period.'],['Exponential growth','Growth by a constant percent applied continuously.'],['Doubling time','How long a population takes to become twice as big at a steady growth rate.'],['Carrying capacity','The largest population an area can support.']],
+act:{title:'Race the lines',intro:'Change the growth rate and watch linear and exponential growth pull apart.',type:'growth'},
+quiz:[{q:'At 2% growth per year, about how long to double (rule of 70)?',o:['35 years','70 years','2 years','140 years'],a:0,w:'70 ÷ 2 = 35 years.'},{q:'Which growth adds the SAME number each year?',o:['Linear','Exponential','Logistic','Geometric'],a:0,w:'Linear growth adds a constant amount.'},{q:'What does carrying capacity mean?',o:['The maximum population an area can support','The weight a car can carry','How many babies are born','The speed of growth'],a:0,w:'Logistic growth levels off near the carrying capacity.'},{q:'Ghana’s population grew about 2.1% a year between 2010 and 2021. Using the rule of 70, about how long to double?',o:['About 33 years','About 70 years','About 2 years','About 100 years'],a:0,w:'70 ÷ 2.1 ≈ 33 years.'}],
+take:'Growth Guru! You can tell stairs from rabbits and you know when a population will double.'});
+
+M.push({id:'m14',zone:2,emoji:'⚕️',title:'Measuring deaths fairly',ch:'Chapter 12 · Mortality',badge:'Fair Play Statistician',
+cards:[
+['📄','Where death data come from','Most death numbers come from <b>death certificates</b> in a registration system. If fewer than about 90% of deaths are registered, the numbers must be used carefully.'],
+['⚰️','Crude death rate','The <b>crude death rate</b> = deaths in a year ÷ the average (midyear) population × 1,000. It is simple but hides who is dying: older people die more often, so countries with many older people look worse.'],
+['🍼','Death rates by age','An <b>age-specific death rate</b> looks at one age group. The <b>infant mortality rate</b> counts deaths of babies under 1 per 1,000 live births. Deaths are also grouped by cause using an international list (the <b>ICD</b>). In Ghana, under-five deaths fell from 155 per 1,000 live births in 1988 to 40 in 2022 (Demographic and Health Survey).'],
+['⚖️','Fair comparisons','<b>Age adjustment</b> (standardization) gives two places the same pretend age mix before comparing them. Otherwise, a young town and an old town are not racing on equal terms.']
+],
+words:[['Crude death rate','Deaths in a year per 1,000 people. It ignores age.'],['Age-specific death rate','Deaths among one age group per 1,000 people of that age.'],['Infant mortality rate','Deaths of babies under age 1 per 1,000 live births.'],['ICD','International Classification of Diseases, a standard list for naming causes of death.'],['Age adjustment','Comparing places as if they had the same mix of ages.']],
+act:{title:'The fair race',intro:'Two towns compare their death rates. Is the crude rate fair?',type:'fair'},
+quiz:[{q:'Why can the crude death rate be unfair for comparing places?',o:['Older populations have more deaths even if healthcare is great','It uses too many numbers','Babies never die','Rates cannot be compared'],a:0,w:'Crude rates ignore age structure.'},{q:'Infant mortality rate counts deaths of children…',o:['Under 1 year old per 1,000 live births','Under 18','Under 5 per 100','Of all ages'],a:0,w:'It is deaths under age 1 per 1,000 live births.'},{q:'What does age adjustment do?',o:['Gives places the same age mix so they can be compared fairly','Makes people older','Adds more deaths','Removes babies'],a:0,w:'It removes the effect of different age structures.'},{q:'Ghana’s under-five mortality fell from 155 (1988) to 40 (2022) per 1,000 live births. About how many fewer deaths per 1,000?',o:['115','195','40','155'],a:0,w:'155 − 40 = 115 fewer deaths per 1,000 live births.'}],
+take:'You can now spot an unfair comparison from a mile away.'});
+
+M.push({id:'m15',zone:2,emoji:'🧓',title:'The life table: 100 babies',ch:'Chapter 13 · The Life Table',badge:'Life Table Legend',
+cards:[
+['👶','A story of imaginary babies','A <b>life table</b> follows a pretend group of newborns (usually 100,000, called the <b>radix</b>) through life, using the death rates of one period. It shows how many are still alive at each age.'],
+['🔤','The columns','<b>q(x)</b>: the chance of dying between ages x and the next age. <b>l(x)</b>: how many are alive at exact age x. <b>d(x)</b>: how many die in that age interval. <b>L(x)</b>: years lived by the group in the interval. <b>T(x)</b>: total years still to be lived after age x. <b>e(x)</b> = T(x) ÷ l(x): <b>life expectancy</b> at age x.'],
+['📜','History','John Graunt studied London death records in 1662. In 1693 Edmund Halley built the first real life table, using births and deaths in Breslau (then in Silesia). Insurance companies, doctors and economists all use life tables today.'],
+['🇬🇭','Ghana’s babies','A life table starts with babies. In Ghana, <b>40 out of every 1,000</b> babies die before age 5 (2022), down from <b>155</b> in 1988. So about 96 out of 100 babies now reach their fifth birthday.'],
+['🧪','Special life tables','A <b>cause-eliminated</b> table asks “How long would we live if a disease disappeared?” <b>Working-life tables</b> follow years in the labor force. <b>Multistate tables</b> follow people moving between statuses. A <b>generation</b> table follows a real group, while a <b>period</b> table uses one year’s rates.']
+],
+words:[['Life table','A table showing how a group of newborns would shrink with age under certain death rates.'],['Radix','The starting group of babies in a life table, often 100,000.'],['Life expectancy','The average number of years left to live at a given age.'],['q(x)','The chance of dying in an age interval.'],['l(x)','The number still alive at exact age x.']],
+act:{title:'Follow 100 babies',intro:'Slide through life and watch the circles. Then compare a modern country to a town long ago.',type:'babies'},
+quiz:[{q:'What is a radix in a life table?',o:['The starting group of newborns, like 100,000','The last age','A death rate','The year of the census'],a:0,w:'The radix is the cohort of births that the table follows.'},{q:'e(x) tells you…',o:['Average years of life left at age x','The number of deaths at age x','The year x','How many babies are born'],a:0,w:'e(x) = T(x) ÷ l(x) is life expectancy at age x.'},{q:'Who made the first real life table in 1693?',o:['Edmund Halley','John Snow','Albert Einstein','Dot'],a:0,w:'Halley used births and deaths from Breslau.'},{q:'Ghana’s under-five mortality is 40 per 1,000 births. Of 100 babies, about how many are alive on their fifth birthday?',o:['About 96','About 60','About 40','About 99'],a:0,w:'40 per 1,000 is 4 per 100, so about 96 reach age 5. That is like l(5) in a life table.'}],
+take:'You can follow a whole life in a table. That is time travel for numbers!'});
+
+M.push({id:'m16',zone:2,emoji:'🩺',title:'Health beyond deaths',ch:'Chapter 14 · Health Demography',badge:'Health Hero',
+cards:[
+['🤒','More than dying','Health is not only about death. <b>Morbidity</b> means sickness and <b>disability</b> means difficulty doing everyday things. Surveys and censuses now ask about both.'],
+['📊','Incidence and prevalence','<b>Incidence</b> = the number of <b>new</b> cases of an illness in a period. <b>Prevalence</b> = how many people <b>have</b> it at a given time. Long illnesses have high prevalence even when few new cases appear.'],
+['❤️','Healthy life expectancy','Life expectancy counts years of life. <b>Healthy (or disability-free) life expectancy</b> counts years lived <b>without</b> disability. Two countries can have the same life expectancy but different healthy years.'],
+['🇬🇭','Health differs between groups','In Ghana, 17 of every 1,000 babies die in their <b>first 28 days</b> (neonatal mortality, 2022). Under-5 deaths are about <b>52 per 1,000</b> when mothers have no education but <b>19 per 1,000</b> when mothers have secondary school or more.'],
+['👶','Pregnancy and early life','<b>Fetal deaths</b> and <b>perinatal deaths</b> (around the time of birth) are tracked, plus how many women use contraception (<b>contraceptive prevalence</b>). All these help plan clinics and schools.']
+],
+words:[['Morbidity','Illness or sickness in a population.'],['Incidence','The number of new cases of a condition in a period of time.'],['Prevalence','The number or share of people who have a condition at a given time.'],['Disability','A limit on doing normal activities.'],['Healthy life expectancy','Average years of life lived without disability.']],
+act:{title:'The cold in the classroom',intro:'Change how many students catch a cold and how long it lasts.',type:'sick'},
+quiz:[{q:'Which counts NEW cases of a disease in a month?',o:['Incidence','Prevalence','Radix','Density'],a:0,w:'Incidence is about new cases.'},{q:'A long-lasting illness will have…',o:['High prevalence even if new cases are few','Zero prevalence','Negative incidence','No effect'],a:0,w:'Prevalence ≈ incidence × duration.'},{q:'What does healthy life expectancy measure?',o:['Years lived without disability','Years in school','Years since a doctor visit','Years of sleep'],a:0,w:'It adds quality to length of life.'},{q:'In Ghana, under-5 mortality is 52 per 1,000 for children of mothers with no education and 19 per 1,000 for mothers with secondary school or more. What does this show?',o:['Health outcomes differ between groups','Everyone is the same','Education has no link to health','Mothers do not matter'],a:0,w:'Demographers compare groups to see where help is needed most.'}],
+take:'Health Hero! You know the difference between getting sick and being sick.'});
+
+M.push({id:'m17',zone:2,emoji:'👶',title:'Counting babies',ch:'Chapter 15 · Natality: Measures Based on Vital Statistics',badge:'Birth Whiz',
+cards:[
+['🍼','Crude birth rate','The <b>crude birth rate</b> = births in a year per 1,000 people. It varies hugely: around 1996 it was roughly 46 to 54 in Ethiopia, Mali and Niger but only about 10 in Germany and Japan.'],
+['👩','Rates for women','The <b>general fertility rate</b> counts births per 1,000 <b>women aged 15–49</b>, a better base than everyone. The <b>age-specific birth rate</b> counts births per 1,000 women of one age group.'],
+['🧮','The total fertility rate','<b>TFR</b> = sum of the age-specific rates × the width of the age groups (5 years) ÷ 1,000. It means: the average number of children a woman would have if she lived through all her childbearing years at today’s rates. About 2.1 is replacement level.'],
+['🇬🇭','Ghana’s fertility story','Ghana’s TFR fell from <b>6.4</b> children per woman in 1988 to <b>3.9</b> in 2022. It differs by place: <b>2.9</b> in Greater Accra but <b>6.6</b> in the North East Region.'],
+['🔍','More details','Demographers also look at <b>birth order</b> (first child, second child…), births to married and unmarried women, and compare <b>cohort</b> fertility (a real group of women over time) to <b>period</b> fertility (one year’s snapshot). Standardization can adjust for different age mixes.']
+],
+words:[['Crude birth rate','Births in a year per 1,000 people.'],['General fertility rate','Births per 1,000 women of childbearing age (15–49).'],['Age-specific birth rate','Births per 1,000 women in one age group.'],['Total fertility rate','Average children per woman if today’s age-specific rates stayed the same through her life.'],['Cohort','A group of people who share a birth year or other starting point.']],
+act:{title:'Build a fertility rate',intro:'Move the sliders for each mother’s age group and watch the TFR.',type:'tfr'},
+quiz:[{q:'What does TFR stand for?',o:['Total fertility rate','Time for rest','Tall family record','Total fish rate'],a:0,w:'TFR is the total fertility rate.'},{q:'Which is a better base for fertility: all people or women of childbearing age?',o:['Women of childbearing age','All people','Men','Babies'],a:0,w:'The general fertility rate uses women 15–49.'},{q:'About what TFR means a population exactly replaces itself?',o:['About 2.1','About 5','About 0.5','About 10'],a:0,w:'Replacement is a little over 2 children per woman.'},{q:'Ghana’s total fertility rate fell from 6.4 (1988) to 3.9 (2022). What does 3.9 mean?',o:['The average woman would have about 3.9 children in her life at today’s rates','3.9% of women have babies','3.9 babies are born each day','Every woman has exactly 4 children'],a:0,w:'TFR is the average number of children per woman if today’s age-specific rates stayed the same.'}],
+take:'You can turn a table of births into one number a woman’s whole life. Neat!'});
+
+M.push({id:'m18',zone:2,emoji:'🧩',title:'Babies from census clues',ch:'Chapter 16 · Natality: Measures Based on Censuses and Surveys',badge:'Birth Detective',
+cards:[
+['🕳️','When birth records are poor','Many countries do not record every birth. A census or survey can fill the gap by asking women: <b>how many children have you ever had</b> (children ever born), and <b>how many are still alive</b>?'],
+['🏠','The own-children method','In a household list, link each child to their <b>mother</b> using relationship answers. The child’s <b>age</b> tells you about <b>when</b> the birth happened, and the mother’s age minus the child’s age tells you how old she was. With many homes you can estimate births in past years.'],
+['🇬🇭','Ghana’s questions','Ghana’s 2021 census data include topics such as <b>live births</b> and a <b>summary birth history</b>. The Ghana Demographic and Health Survey also interviews women about all their births.'],
+['📖','Birth histories','A <b>birth history</b> asks a woman for the date of each birth. From those, demographers measure <b>parity progression</b>: out of women with one child, how many go on to have a second?'],
+['🎯','Rates need exposure','A rate = <b>events ÷ exposure</b> (person-years at risk). Surveys only ask a sample, so results come with a margin of error (confidence interval).']
+],
+words:[['Children ever born','The number of live births a woman has had over her life so far.'],['Own-children method','Linking children to their mothers in a household list to estimate past births.'],['Parity','The number of children a woman has had.'],['Exposure','The amount of time people were at risk of an event, such as person-years.']],
+act:{title:'Match children to mothers',intro:'Use the household list to find each child’s mother.',type:'ownchild'},
+quiz:[{q:'What two questions does “children ever born / surviving” use?',o:['How many children ever born, and how many still alive?','How tall and how old?','Where born and where living?','What school and what job?'],a:0,w:'Together they reveal both fertility and child survival.'},{q:'Akosua is 40. Her son Kwame is 10. How old was Akosua at his birth?',o:['30','10','40','50'],a:0,w:'40 − 10 = 30.'},{q:'What is parity?',o:['The number of children a woman has had','A kind of tax','A death rate','A game'],a:0,w:'Parity counts previous births.'},{q:'Which topics did Ghana’s 2021 census data include to learn about fertility?',o:['Live births and a summary birth history','Shoe sizes','Favourite songs','Bus routes'],a:0,w:'Questions on live births and birth history help estimate fertility.'}],
+take:'Birth Detective! You can rebuild past births from a list of who lives where.'});
+
+M.push({id:'m19',zone:2,emoji:'🔁',title:'Will a generation replace itself?',ch:'Chapter 17 · Reproductivity',badge:'Replacement Ranger',
+cards:[
+['🧬','Replacing ourselves','<b>Reproductivity</b> asks: is a group replacing its own numbers across a whole <b>generation</b>, not just in one year? It combines fertility and mortality.'],
+['👧','GRR and NRR','The <b>gross reproduction rate (GRR)</b> counts daughters per woman if no girl ever died before the end of childbearing. The <b>net reproduction rate (NRR)</b> includes deaths. If <b>NRR = 1</b>, each generation exactly replaces itself. Below 1 it shrinks, above 1 it grows.'],
+['🇬🇭','Is Ghana above replacement?','Replacement fertility is a little over <b>2.1</b> children per woman. Ghana’s TFR was <b>3.9</b> in 2022, well above that, and Ghana’s population grew about 2.1% a year between 2010 and 2021.'],
+['⚖️','The stable population','If fertility and mortality stayed the same for a long time, a population would settle into a fixed shape with a constant growth rate called the <b>intrinsic rate</b>. This “stable population” idea helps with estimating and analyzing data.'],
+['📌','Simple yearly measures','The <b>crude rate of natural increase</b> = crude birth rate − crude death rate. The <b>vital index</b> = births per 100 deaths. They are easy to compute but do not tell the whole generation story.']
+],
+words:[['Gross reproduction rate','Daughters a woman would have if no girl died before the end of her childbearing years.'],['Net reproduction rate','Daughters per woman after deaths are counted. 1 means exact replacement.'],['Stable population','A population that would result from fixed fertility and mortality over a long time.'],['Intrinsic rate','The steady growth rate of a stable population.'],['Vital index','Births per 100 deaths.']],
+act:{title:'Do the daughters replace the mothers?',intro:'Move the sliders and watch three generations of baby girls.',type:'nrr'},
+quiz:[{q:'NRR = 1 means…',o:['Each generation exactly replaces itself','The population doubles','The population vanishes','Nothing about growth'],a:0,w:'An NRR of 1 is exact replacement.'},{q:'Which counts deaths: GRR or NRR?',o:['NRR','GRR','Neither','Both'],a:0,w:'NRR is “net” of deaths.'},{q:'Crude rate of natural increase equals…',o:['Birth rate − death rate','Birth rate + death rate','Deaths ÷ births','Births × deaths'],a:0,w:'Natural increase is births minus deaths.'},{q:'Ghana’s TFR is 3.9 and replacement is about 2.1. Compared with replacement, Ghana’s fertility is…',o:['Above replacement, so each generation is bigger','Below replacement','Exactly replacement','Zero'],a:0,w:'A TFR above about 2.1, with most girls surviving, means each generation is larger.'}],
+take:'You can tell if a generation will fill the shoes of the last. Replacement Ranger!'});
+
+M.push({id:'m20',zone:2,emoji:'✈️',title:'Moving between countries',ch:'Chapter 18 · International Migration',badge:'Border Explorer',
+cards:[
+['🛫','The third factor','Migration is the third basic cause of change, next to births and deaths. It changes the size of both the place people leave and the place they go to, and also who lives there (age, language, jobs).'],
+['🔍','Words to know','<b>Immigrants</b> come in, <b>emigrants</b> go out. A <b>flow</b> is people moving during a period. A <b>stock</b> is how many foreign-born people live there at one time. <b>Temporary</b> migrants stay a short time, <b>permanent</b> ones stay. Refugees flee danger. Some migrants are <b>undocumented</b>, which is hard to measure.'],
+['🇬🇭','Counting Ghanaians abroad','Ghana’s 2021 census data include separate records for <b>emigrants</b> and for <b>absentees</b>, and the census asks about <b>place of birth</b>. Together these help Ghana see who comes in and who leaves.'],
+['📋','Where migration data come from','Border and visa records, population registers, census questions on <b>country of birth</b> and <b>where you lived before</b>, and surveys. No single source is perfect.'],
+['🧮','The residual trick','If we know population at the start and end, plus births and deaths, we can find net migration: <b>net migration = (end − start) − (births − deaths)</b>. <b>Net</b> means in minus out. <b>Gross</b> counts all the moves in both directions.']
+],
+words:[['Flow','The number of people who move during a period of time.'],['Stock','The number of people in a given category at one time, like the foreign-born.'],['Net migration','Immigrants minus emigrants.'],['Gross migration','All moves in and out added together.'],['Nativity','Whether a person was born in the country where they live.']],
+act:{title:'The missing movers',intro:'Nobody counted who moved to Tolu Island. Work it out from the other numbers.',type:'residual'},
+quiz:[{q:'Start 10,000. End 10,600. Births 500, deaths 200. Net migration?',o:['+300','+600','−300','+100'],a:0,w:'Change 600 − natural increase 300 = +300.'},{q:'What is a “stock” of migrants?',o:['How many foreign-born people live in a place at one time','Moves in one year','A kind of boat','A tax'],a:0,w:'A stock is a count at a moment. A flow is a count of moves.'},{q:'What does “net” migration mean?',o:['Immigrants minus emigrants','Immigrants plus emigrants','Only emigrants','Only immigrants'],a:0,w:'Net is the balance of in and out.'}],
+take:'Border Explorer! You can find movers nobody counted.'});
+
+M.push({id:'m21',zone:2,emoji:'🚚',title:'Moving within a country',ch:'Chapter 19 · Internal Migration and Short-Distance Mobility',badge:'Mover Mapper',
+cards:[
+['🏠','Movers and migrants','<b>Mobility</b> means any move to a new home. <b>Migration</b> means a move that crosses a boundary, such as to another town, region or country. Every migrant is a mover, but not every mover is a migrant.'],
+['➡️','In, out, net','For any area: <b>in-migrants</b> arrive, <b>out-migrants</b> leave, and <b>net migration</b> is the difference. A <b>stream</b> is the flow of movers from one place to another.'],
+['🎯','Moving is a choice','People who move are not a random sample. Young adults move most. So migration can <b>change a place</b>: Florida’s share of people aged 65+ rose from 8.6% in 1950 to 17.6% in 2000. California’s population became much more diverse between 1970 and 2000.'],
+['🇬🇭','Ghana on the move','Between 2010 and 2021 Greater Accra grew from 4,010,054 to <b>5,455,692</b> people (+36%), and almost half (47.8%) of Ghana’s urban growth was in Greater Accra and Ashanti. The Northern Region grew by almost 50%. People moving in from other places is part of the story.'],
+['📚','Finding the data','Census questions such as “where did you live five years ago?”, population registers, tax and school records, and surveys. When there is no direct data, demographers estimate with <b>residual</b> and <b>survival-rate</b> methods.']
+],
+words:[['Mobility','Any change of home address, near or far.'],['Migration','A move that crosses a boundary, such as between towns or countries.'],['In-migration','Moving into an area from another part of the same country.'],['Out-migration','Moving out of an area to another part of the same country.'],['Migration stream','The flow of migrants from one area to another.']],
+act:{title:'Mover, internal migrant or international migrant?',intro:'Sort each move.',type:'sort',cfg:{
+buckets:[{k:'mover',e:'🏘️',label:'Local mover (same area)'},{k:'int',e:'🚚',label:'Internal migrant'},{k:'abroad',e:'✈️',label:'International migrant'}],
+items:[{t:'A family moves from one street to another in the same town',k:'mover',w:'Same town: a local move, not a migration.'},{t:'A family moves from Tamale in the Northern Region to Accra',k:'int',w:'Crosses a regional boundary inside the country.'},{t:'A Ghanaian nurse moves to another country for a new job',k:'abroad',w:'Crossing a national border is international migration.'},{t:'Students move from a village in the Volta Region to Accra to study',k:'int',w:'Different area, same country.'},{t:'Grandparents move to a smaller flat two blocks away',k:'mover',w:'A short move inside the same place.'}]}},
+quiz:[{q:'A family moves across town. Are they migrants?',o:['No, they are local movers','Yes, international migrants','They are immigrants','They changed countries'],a:0,w:'Migration crosses a boundary; this stays inside the same area.'},{q:'1,200 people move into a county and 900 move out. Net migration?',o:['+300','+2,100','−300','+900'],a:0,w:'1,200 − 900 = +300.'},{q:'Why do migrants change the make-up of a place?',o:['Movers are often different from those who stay, like younger adults','They never move','They take the population with them','They do not change anything'],a:0,w:'Migration selects certain kinds of people, so composition changes.'},{q:'Greater Accra grew from 4,010,054 (2010) to 5,455,692 (2021). About how many more people?',o:['About 1.45 million','About 5 million','About 4 million','About 145,000'],a:0,w:'5,455,692 − 4,010,054 = 1,445,638. Part of the growth came from people moving in.'}],
+take:'Zone 2 done! You know why populations rise, fall and shift. Next: the Crystal Tower, where we guess what we cannot count.'});
+})();
+(function(){
+const M=window.PE.missions;
+M.push({id:'m22',zone:3,emoji:'🔭',title:'Estimating today’s population',ch:'Chapter 20 · Population Estimates',badge:'Estimate Expert',
+cards:[
+['📅','Three kinds of numbers','An <b>intercensal estimate</b> is for a date <b>between</b> two censuses (filling a gap, called interpolation). A <b>postcensal estimate</b> is for a date <b>after</b> the latest census (reaching forward, called extrapolation). A <b>projection</b> is for the <b>future</b>.'],
+['🕵️','Symptomatic data','Between censuses, demographers use <b>clues</b> that “show symptoms” of population change: births, deaths, school enrollment, tax returns, driver licences, electricity hook-ups and <b>housing units</b>.'],
+['🧰','Estimation methods','The <b>component method</b> adds births and in-migration and subtracts deaths and out-migration. The <b>housing unit method</b> multiplies homes × share occupied × people per home. <b>Ratio-correlation</b> and <b>composite</b> methods combine several clues.'],
+['💵','Why it matters','Governments share money, plan schools and hospitals, and draw voting areas using up-to-date population estimates, even for places that never had a good census. Ghana’s last two censuses were in 2010 and 2021, so numbers for the years between and after need estimates.']
+],
+words:[['Intercensal estimate','An estimate for a date between two censuses.'],['Postcensal estimate','An estimate for a date after the most recent census.'],['Symptomatic data','Indirect clues, like school enrollment, that change when the population changes.'],['Housing unit method','Estimating population from the number of homes, how many are occupied and how many people live in each.'],['Component method','Estimating population by adding births and in-migration and subtracting deaths and out-migration.']],
+act:{title:'Build an estimate from homes',intro:'The census was long ago, but the city kept counting new homes. Use them as a clue.',type:'housing'},
+quiz:[{q:'An estimate for the year between two censuses is called…',o:['Intercensal','Postcensal','A projection','A forecast'],a:0,w:'Intercensal estimates lie between two censuses.'},{q:'4,000 homes, 90% occupied, 3 people each. Estimated population?',o:['10,800','12,000','4,000','3,600'],a:0,w:'4,000 × 0.9 × 3 = 10,800.'},{q:'Which is a symptomatic clue for population?',o:['School enrollment','The color of the town hall','The mayor’s name','The weather'],a:0,w:'School enrollment rises and falls with the number of children.'},{q:'Ghana counted its people in 2010 and 2021. An estimate for the year 2015 is called…',o:['Intercensal','Postcensal','A projection','Primary data'],a:0,w:'2015 lies between two censuses, so it is intercensal.'},{q:'An estimate for 2024, after the 2021 census, is called…',o:['Postcensal','Intercensal','A census','Impossible'],a:0,w:'It comes after the latest census, so it is postcensal.'}],
+take:'Estimate Expert! You can work out a population without a census.'});
+
+M.push({id:'m23',zone:3,emoji:'🔮',title:'Projecting the future',ch:'Chapter 21 · Population Projections',badge:'Future Forecaster',
+cards:[
+['🎯','Estimate, projection, forecast','An <b>estimate</b> is for the present or past. A <b>projection</b> is “what happens <b>if</b> these assumptions hold”. A <b>forecast</b> is the projection judged most likely. A projection cannot be proved wrong, but its assumptions can turn out wrong.'],
+['📈','Simple extrapolation','Extend recent change with a straight line (linear), a fixed percent (geometric) or continuous growth (exponential). It is quick but ignores why the population is changing.'],
+['🧱','Cohort-component method','The favourite method: <b>age each group</b> forward, apply <b>survival</b> rates, add <b>births</b> from women of childbearing age, and add <b>migration</b>. You need assumptions for fertility, mortality and migration.'],
+['🇬🇭','Ghana’s fertility question','The big question in projecting Ghana is fertility. It fell from <b>6.4</b> to <b>3.9</b> children per woman between 1988 and 2022. Will it keep falling? Different answers give different futures, so planners compare scenarios.'],
+['🔀','Alternative series and accuracy','Agencies publish <b>low, medium and high</b> projections to show the uncertainty. Accuracy is measured with <b>MAPE</b> (mean absolute percent error). Errors are larger for small areas and for longer horizons.']
+],
+words:[['Projection','A calculation of future population under stated assumptions.'],['Forecast','The projection thought most likely to come true.'],['Cohort-component method','A projection method that ages each age group and adds births, deaths and migration.'],['Alternative series','Low, medium and high versions of a projection using different assumptions.'],['MAPE','Mean absolute percent error, a way to measure how far off projections were.']],
+act:{title:'Run the projection machine',intro:'Set the fertility, survival and migration assumptions and watch the future change.',type:'project'},
+quiz:[{q:'Why do agencies publish low, medium and high series?',o:['The future is uncertain, so assumptions differ','They like three numbers','They cannot add','To confuse people'],a:0,w:'Different assumptions give different outcomes, showing the range.'},{q:'In the cohort-component method, what happens to each age group?',o:['It moves to the next age group after survival and migration','It disappears','It doubles','It is ignored'],a:0,w:'Groups age forward with survival and migration applied.'},{q:'What is the difference between a projection and a forecast?',o:['A forecast is the projection judged most likely','They are the same','A forecast is always wrong','A projection is a past number'],a:0,w:'All forecasts are projections but not all projections are forecasts.'},{q:'Ghana’s fertility fell from 6.4 to 3.9. If fertility keeps falling, what happens to projections of future population?',o:['It grows more slowly','It grows faster','Nothing changes','It stops today'],a:0,w:'Lower fertility assumptions give slower projected growth.'}],
+take:'Future Forecaster! You know that a projection is a map of “what if”.'});
+
+M.push({id:'m24',zone:3,emoji:'🧰',title:'Tricks for places with few records',ch:'Chapter 22 · Some Methods of Estimation for Statistically Underdeveloped Areas',badge:'Clue Cracker',
+cards:[
+['📦','Stocks and flows','<b>Stock data</b> are counts of people at one time (from a census). <b>Flow data</b> are counts of events during a period (births, deaths, moves). Places with weak records may have only one kind, or lower quality.'],
+['🧩','Indirect estimation','When direct numbers are missing, demographers use <b>indirect techniques</b>. For example, the <b>age structure</b> of a population holds hints about past births and deaths. A very young population hints at high fertility.'],
+['🇬🇭','Surveys fill gaps','Ghana uses big household surveys such as the <b>Demographic and Health Survey</b> (2022 was the seventh since 1988) to measure fertility and child deaths: a TFR of 3.9 and 40 under-five deaths per 1,000 births.'],
+['📐','Model life tables and stable populations','Demographers keep libraries of <b>model life tables</b> (typical mortality patterns) and <b>model stable populations</b>. They compare a place’s limited data with these models to find the best fit.'],
+['👩‍👧','Children ever born and surviving','William Brass’s method uses mothers’ answers about children ever born and children still alive to estimate child mortality. <b>Reverse survival</b> works backwards: take children aged 0–4 and “un-die” them to estimate recent births. Always cross-check with more than one method.']
+],
+words:[['Stock data','Counts of people at one point in time.'],['Flow data','Counts of events like births, deaths or moves over a period.'],['Indirect estimation','Estimating something from related clues because it was not measured directly.'],['Model life table','A typical pattern of death rates at each age, used to fill in missing data.'],['Reverse survival','Working backwards from the number of children to estimate births.']],
+act:{title:'The Brass trick',intro:'Use two questions asked of mothers to learn about child deaths.',type:'brass'},
+quiz:[{q:'Which is a FLOW?',o:['Births in a year','Number of people on census day','Houses in a town','Schools in a region'],a:0,w:'A flow counts events over a period.'},{q:'The Brass method starts from…',o:['Children ever born and children still alive','Rainfall','The price of rice','The number of shoes'],a:0,w:'It uses proportions of children who have died by mother’s age group.'},{q:'Why compare data to model tables?',o:['To borrow a good pattern when real data are partial','To make things longer','To avoid counting','To make pretty charts'],a:0,w:'Model tables fill gaps with realistic patterns.'},{q:'The Ghana Demographic and Health Survey asks mothers about their births. Why?',o:['To estimate fertility and child deaths from a sample','To count shoes','To measure rainfall','To find rivers'],a:0,w:'Surveys with birth questions give fertility and child mortality estimates.'}],
+take:'Zone 3 done! You can estimate, project and use clever clues. Last stop: the Toolbox!'});
+
+M.push({id:'m25',zone:4,emoji:'📊',title:'Shortcut tables and model patterns',ch:'Appendix A and Appendix B',badge:'Table Tinkerer',
+cards:[
+['📋','Appendix A: a shortcut','An <b>abridged life table</b> uses 5-year age groups instead of single years. The <b>Reed–Merrell method</b> gives reference tables so you can build one from simple death rates without a mountain of arithmetic.'],
+['📚','Appendix B: model tables','<b>Model life tables</b> collect typical survival patterns, grouped into <b>families</b> (such as West, North, East and South). Each family has many <b>levels</b>, from short lives to long lives.'],
+['🧮','Stable population tables','These link the birth rate, the death pattern and the growth rate, so one known number can help find the others.'],
+['🧑‍🔧','When to use them','When a country has missing or doubtful records, demographers match a few known numbers (like deaths among children) to the closest model to estimate the rest.']
+],
+words:[['Abridged life table','A life table that uses age groups (like 5 years) instead of single years.'],['Reed–Merrell method','A shortcut recipe for building an abridged life table.'],['Model life table family','A set of life tables that share a typical pattern of deaths by age.'],['Level (of a model)','How high or low life expectancy is within a family.']],
+act:{title:'Match the town to the curve',intro:'Three survival patterns, three mystery towns. Which curve is whose?',type:'curves'},
+quiz:[{q:'Why is an abridged life table “abridged”?',o:['It uses age groups instead of single years','It is on a short page','It is secret','It lists only men'],a:0,w:'Abridged tables use ranges like 5-year groups.'},{q:'What is a model life table family?',o:['A group of tables sharing a typical mortality pattern','A group of relatives','A family tree','A school class'],a:0,w:'Families such as West, North, East and South describe typical patterns.'},{q:'When do demographers use model tables?',o:['When local data are missing or unreliable','Never','Only for fun','When they have perfect data'],a:0,w:'They borrow a realistic pattern to fill gaps.'}],
+take:'Table Tinkerer! You know how to borrow a pattern when data go missing.'});
+
+M.push({id:'m26',zone:4,emoji:'🧪',title:'The maths toolbox',ch:'Appendix C · Selected General Methods',badge:'Math Wizard',
+cards:[
+['🫘','Sampling','A few measurements taken <b>well</b> can tell you more than many taken <b>badly</b>. Sampling saves time and money, but it comes with <b>sampling error</b> (luck of the draw) and <b>non-sampling error</b> (like wrong answers or missing people).'],
+['📏','Filling gaps and fitting curves','<b>Interpolation</b> fills in values between known points. <b>Curve fitting</b> finds a smooth rule that matches the data, so patterns can be described in a few numbers.'],
+['🎛️','Adjusting to known totals','When two sources disagree, demographers adjust one table so its rows and columns add to totals they trust (iterative proportional fitting, or “raking”).'],
+['💻','Computers and big models','Matrix methods, <b>microsimulation</b> (simulating many individual people), system dynamics models and <b>administrative record databases</b> are modern tools. Computers make them fast.']
+],
+words:[['Sampling error','Differences between a sample result and the true value because of chance.'],['Non-sampling error','Mistakes that come from anything other than chance, like wrong answers.'],['Interpolation','Estimating a value between two known values.'],['Curve fitting','Finding a smooth mathematical line that follows the data.'],['Microsimulation','A computer model that follows many individual people through life events.']],
+act:{title:'Two toolbox tricks',intro:'First scoop beans to see sampling at work. Then fill a gap between two censuses.',type:'toolbox'},
+quiz:[{q:'Which sample should be steadier?',o:['A bigger sample','A smaller sample','They are the same','Neither'],a:0,w:'Larger samples vary less from the true value.'},{q:'What is interpolation?',o:['Estimating between known values','Predicting the far future','Counting beans','Deleting data'],a:0,w:'Interpolation fills in values inside the known range.'},{q:'What is microsimulation?',o:['A computer model of many individual people','A tiny microscope','A small census','A short quiz'],a:0,w:'It follows many simulated people through life events.'},{q:'Ghana had 24,658,823 people in 2010 and 30,832,019 in 2021. What is the straight-line guess halfway between?',o:['About 27.7 million','About 24.7 million','About 30.8 million','About 55 million'],a:0,w:'(24,658,823 + 30,832,019) ÷ 2 ≈ 27,745,421.'}],
+take:'Math Wizard! Samples, gap-filling and computer models are now in your pocket.'});
+
+M.push({id:'m27',zone:4,emoji:'🧭',title:'Maps that think (GIS)',ch:'Appendix D · Geographic Information Systems',badge:'Map Wizard',
+cards:[
+['🧱','Layers of a map','A <b>GIS</b> (Geographic Information System) stores a map as <b>layers</b>. <b>Points</b> are things like homes or pumps, <b>lines</b> are roads or rivers, <b>polygons</b> are areas like towns. You switch layers on and off to ask questions.'],
+['💧','Snow and the pump','In 1854, Dr. John Snow mapped cholera cases and water wells in London. The cases clustered around one pump. Closing it helped stop the outbreak. It is one of the first times a map shaped public policy.'],
+['🏛️','Census maps','In the late 1960s, the US Census Bureau tested digital address and street files (including a test in New Haven in 1967). Making maps into numbers was the start of modern GIS.'],
+['🇬🇭','Ghana’s map in polygons','Ghana’s <b>16 regions</b> and <b>261 districts</b> are polygons on a map. A thematic map of the 2021 census shows big differences even inside Greater Accra: crowded Ablekuma Central has about 17,000 people per km², while Ada West has about 230.'],
+['🎨','Thematic maps','A <b>thematic map</b> colors areas by a topic, such as percent population change. GIS also turns addresses into points on a map (geocoding), which is powerful and raises <b>privacy</b> questions.']
+],
+words:[['GIS','A computer system for storing, mapping and analyzing information tied to places.'],['Layer','One set of map features, like roads or homes, that can be shown or hidden.'],['Thematic map','A map that shows a topic, such as population change, with colors.'],['Geocoding','Turning an address into a point on a map.']],
+act:{title:'Be Dr. Snow',intro:'Turn layers on and off and find the pump that spread the sickness.',type:'snow'},
+quiz:[{q:'On a GIS map, a home is usually shown as a…',o:['Point','Line','Polygon','Song'],a:0,w:'Homes are points, roads are lines, towns are polygons.'},{q:'What did John Snow’s map show?',o:['Sick homes clustered around one pump','The tallest buildings','Where roads were','The weather'],a:0,w:'The cluster pointed to one contaminated pump.'},{q:'What is a thematic map?',o:['A map that colors places by a topic','A map of Atlantis','A treasure map','A map of the sky'],a:0,w:'It shows a topic such as percent change.'},{q:'Ghana has 16 regions and 261 districts. On a GIS map these areas are drawn as…',o:['Polygons','Points','Lines','Songs'],a:0,w:'Areas such as regions and districts are polygons.'}],
+take:'Map Wizard! You can layer maps to solve a mystery.'});
+
+M.push({id:'m28',zone:4,emoji:'⏳',title:'The time machine and the glossary gym',ch:'Glossary and A Demography Time Line',badge:'Junior Demographer',
+cards:[
+['📜','Long ago','In 1662 John Graunt studied London’s “Bills of Mortality”. In 1693 Edmund Halley built the first real life table, using Breslau records. Censuses became regular in places like England and France starting in 1801.'],
+['🗺️','Names and maps','In 1854 John Snow mapped cholera. In 1855 Achille Guillard coined the word <b>“démographie”</b>, which became <b>demography</b>.'],
+['💻','Machines and sampling','In 1890 the US census was tabulated with punched cards and electricity (Herman Hollerith), a step toward computers. In 1900 Norway first used sampling in a national census.'],
+['🇬🇭','Ghana counts','Ghana’s post-independence censuses counted <b>6.7 million</b> people in 1960, <b>8.6 million</b> in 1970, <b>12.3 million</b> in 1984, <b>18.9 million</b> in 2000, <b>24.7 million</b> in 2010 and <b>30.8 million</b> in 2021.'],
+['🌍','Modern times','In 1960 the contraceptive pill was approved in the United States, and fertility patterns changed in many countries. Today computers, surveys, maps and models work together. You now know the main ideas behind all of it!']
+],
+words:[['Glossary','An alphabetical list of important words and what they mean.'],['Time line','A list of events in the order they happened.'],['Démographie','The French word coined in 1855 that became “demography”.'],['Hollerith','The inventor of punched-card tabulating machines first used for the 1890 US census.']],
+act:{title:'Order the history, then hit the gym',intro:'First put world history in order, then Ghana’s censuses, then answer glossary questions.',run:function(root,api){
+  const PE=window.PE;const a=PE.el('div'),g=PE.el('div'),b=PE.el('div');root.append(a,PE.el('hr'),PE.el('h4',null,'🇬🇭 Ghana’s censuses'),g,PE.el('hr'),b);
+  let d1=false,d2=false,d3=false;const fin=()=>{if(d1&&d2&&d3)api.done();};
+  PE.acts.order(a,{done:()=>{d1=true;fin();}},{prompt:'Tap the events from oldest to newest.',items:[{t:'John Graunt studies London’s Bills of Mortality',y:'1662'},{t:'Halley builds the first life table from Breslau records',y:'1693'},{t:'Regular censuses begin in England and France',y:'1801'},{t:'John Snow maps cholera and water pumps in London',y:'1854'},{t:'The word “démographie” is coined',y:'1855'},{t:'US census tabulated with punched cards',y:'1890'},{t:'Norway first uses sampling in a national census',y:'1900'},{t:'The birth control pill is approved in the US',y:'1960'}]});
+  PE.acts.order(g,{done:()=>{d3=true;fin();}},{prompt:'Tap Ghana’s censuses from the first to the latest. Tip: Ghana keeps growing!',items:[{t:'6.7 million people counted',y:'1960'},{t:'8.6 million people counted',y:'1970'},{t:'12.3 million people counted',y:'1984'},{t:'18.9 million people counted',y:'2000'},{t:'24.7 million people counted',y:'2010'},{t:'30.8 million people counted',y:'2021'}]});
+  PE.acts.quizgym(b,{done:()=>{d2=true;fin();}});
+}},
+quiz:[{q:'Who built the first real life table in 1693?',o:['Edmund Halley','John Snow','Herman Hollerith','Dot'],a:0,w:'Halley used births and deaths in Breslau.'},{q:'Which 1890 invention helped with the census count?',o:['Punched-card tabulating machines','The telescope','Email','The telephone'],a:0,w:'Hollerith’s machines used punched cards and electricity.'},{q:'What does demography study?',o:['Size, location, make-up and change of human populations','Only weather','Only animals','Only money'],a:0,w:'That is exactly what this whole course was about!'},{q:'How many people did Ghana’s 2021 census count?',o:['30,832,019','24,658,823','6,726,815','18,912,079'],a:0,w:'2021: 30,832,019. The others are the counts for 2010, 1960 and 2000.'}],
+take:'You did it! Every one of the 28 missions is part of how real demographers count, describe and understand the world’s people.'});
+})();
+window.PE.start();
+</script>
+</body>
+</html>
